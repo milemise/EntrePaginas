@@ -1,8 +1,273 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Entre Páginas";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="home-page">
+
+
+    <section class="hero-section">
+
+        <nav class="home-navbar">
+
+            <a class="brand" href="/">
+                <img class="brand-logo" src="/images/logo.png" alt="logo">
+
+                <span>Entre Páginas</span>
+            </a>
+
+            <div class="nav-links">
+                <a href="/">Inicio</a>
+                <a href="#">Catálogo</a>
+                <a href="#">Nosotros</a>
+                <a href="#">Contacto</a>
+            </div>
+
+            <div class="nav-actions">
+
+                <a href="#" class="btn-login">
+                    <span>♟</span>
+                    Iniciar sesión
+                </a>
+
+                <a href="#" class="btn-register">
+                    Registrarse
+                </a>
+
+            </div>
+
+        </nav>
+
+
+        <div class="hero-content">
+
+            <div class="book-symbol">
+                <img class="book-icon" src="/images/logo.png" alt="logo">
+            </div>
+
+            <h1>Entre Páginas</h1>
+
+            <div class="ornament">
+                <span></span>
+                <i>🪶</i>
+                <span></span>
+            </div>
+
+            <p>
+                Donde cada historia encuentra a su lector
+            </p>
+
+        </div>
+
+
+        <div class="search-panel">
+
+            <div class="search-row">
+
+                <div class="search-input">
+                    <span>⌕</span>
+
+                    <input
+                        type="text"
+                        placeholder="Buscar un libro..." />
+                </div>
+
+                <button class="search-button">
+                    <span>⌕</span>
+                    Buscar
+                </button>
+
+            </div>
+
+
+            <div class="category-filters">
+
+                <label>
+                    <input type="checkbox">
+                    <span>Fantasía</span>
+                </label>
+
+                <label>
+                    <input type="checkbox">
+                    <span>Terror</span>
+                </label>
+
+                <label>
+                    <input type="checkbox">
+                    <span>Romance</span>
+                </label>
+
+                <label>
+                    <input type="checkbox">
+                    <span>Ciencia ficción</span>
+                </label>
+
+                <label>
+                    <input type="checkbox">
+                    <span>Misterio</span>
+                </label>
+
+                <label>
+                    <input type="checkbox">
+                    <span>Acción</span>
+                </label>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <section class="books-section">
+
+        <div class="books-container">
+
+            <div class="section-title">
+
+                <span class="line"></span>
+
+                <div>
+                    <img src="/images/logo.jpg" alt="logo">
+                   <h2>Libros destacados</h2>
+                </div>
+
+                <span class="line"></span>
+
+            </div>
+
+
+            <div class="books-grid">
+
+                <article class="book-card">
+
+                    <img
+                        src="/images/portada1.jpg"
+                        alt="El legado de las sombras">
+
+                    <h3>El legado de las sombras</h3>
+
+                    <p class="author">
+                        L. Martínez
+                    </p>
+
+                    <span class="category fantasy">
+                        Fantasía
+                    </span>
+
+                    <a href="#" class="book-button">
+                        Ver más
+                    </a>
+
+                </article>
+
+
+                <article class="book-card">
+
+                    <img
+                        src="/images/portada2.jpg"
+                        alt="Susurros en la oscuridad">
+
+                    <h3>Susurros en la oscuridad</h3>
+
+                    <p class="author">
+                        C. Rivas
+                    </p>
+
+                    <span class="category horror">
+                        Terror
+                    </span>
+
+                    <a href="#" class="book-button">
+                        Ver más
+                    </a>
+
+                </article>
+
+
+                <article class="book-card">
+
+                    <img
+                        src="/images/portada3.jpg"
+                        alt="Bajo el mismo cielo">
+
+                    <h3>Bajo el mismo cielo</h3>
+
+                    <p class="author">
+                        M. Torres
+                    </p>
+
+                    <span class="category romance">
+                        Romance
+                    </span>
+
+                    <a href="#" class="book-button">
+                        Ver más
+                    </a>
+
+                </article>
+
+
+                <article class="book-card">
+
+                    <img
+                        src="/images/portada4.jpg"
+                        alt="El último horizonte">
+
+                    <h3>El último horizonte</h3>
+
+                    <p class="author">
+                        D. Sánchez
+                    </p>
+
+                    <span class="category scifi">
+                        Ciencia ficción
+                    </span>
+
+                    <a href="#" class="book-button">
+                        Ver más
+                    </a>
+
+                </article>
+
+
+                <article class="book-card">
+
+                    <img
+                        src="/images/portada5.jpg"
+                        alt="El enigma del bosque">
+
+                    <h3>El enigma del bosque</h3>
+
+                    <p class="author">
+                        P. Gómez
+                    </p>
+
+                    <span class="category mystery">
+                        Misterio
+                    </span>
+
+                    <a href="#" class="book-button">
+                        Ver más
+                    </a>
+
+                </article>
+
+            </div>
+
+
+            <div class="more-stories">
+
+                <span></span>
+
+                <p>
+                    Más historias te esperan...
+                </p>
+
+                <span></span>
+
+            </div>
+
+        </div>
+
+    </section>
+
 </div>
