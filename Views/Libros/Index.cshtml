@@ -1,0 +1,594 @@
+@{
+    ViewData["Title"] = "Biblioteca";
+}
+
+<div class="library-page">
+
+    <div class="library-container">
+
+        <div class="library-search">
+
+            <div class="library-search-input">
+
+                <span>⌕</span>
+
+                <input type="text"
+                       placeholder="Buscar un libro, autor o categoría..." />
+
+            </div>
+
+            <button type="button" class="library-search-button">
+                Buscar
+            </button>
+
+        </div>
+
+
+        <div class="library-filters">
+
+            <button type="button" class="library-filter active">
+                Todos
+            </button>
+
+            <button type="button" class="library-filter">
+                Fantasía
+            </button>
+
+            <button type="button" class="library-filter">
+                Romance
+            </button>
+
+            <button type="button" class="library-filter">
+                Terror
+            </button>
+
+            <button type="button" class="library-filter">
+                Ciencia ficción
+            </button>
+
+            <button type="button" class="library-filter">
+                Misterio
+            </button>
+
+        </div>
+
+
+        <div class="library-results">
+
+            <span>
+                12 libros encontrados
+            </span>
+
+            <select class="library-order">
+
+                <option>Ordenar por</option>
+
+                <option>Precio menor</option>
+
+                <option>Precio mayor</option>
+
+                <option>Más vendidos</option>
+
+                <option>Mejor puntuados</option>
+
+            </select>
+
+        </div>
+
+
+        <div class="library-grid">
+
+
+            <article class="library-book-card">
+
+                <a href="#" class="library-book-cover">
+
+                    <img src="/images/portada1.jpg"
+                         alt="Portada de El Hobbit" />
+
+                </a>
+
+                <div class="library-book-content">
+
+                    <span class="library-category fantasy">
+                        Fantasía
+                    </span>
+
+                    <h2>
+                        El Hobbit
+                    </h2>
+
+                    <p class="library-author">
+                        por J. R. R. Tolkien
+                    </p>
+
+                    <p class="library-description">
+                        Bilbo Bolsón emprende una aventura inesperada
+                        que cambiará para siempre su tranquila vida.
+                    </p>
+
+                    <div class="library-rating">
+
+                        <span class="stars">
+                            ★★★★★
+                        </span>
+
+                        <span>
+                            4.8
+                        </span>
+
+                    </div>
+
+                    <div class="library-price">
+
+                        <span class="price-label">
+                            Comprar
+                        </span>
+
+                        <strong>
+                            $18.000
+                        </strong>
+
+                    </div>
+
+                    <a href="#" class="library-view-button">
+                        Ver libro
+                    </a>
+
+                </div>
+
+            </article>
+
+
+            <article class="library-book-card">
+
+                <a href="#" class="library-book-cover">
+
+                    <img src="/images/portada2.jpg"
+                         alt="Portada de Harry Potter" />
+
+                </a>
+
+                <div class="library-book-content">
+
+                    <span class="library-category fantasy">
+                        Fantasía
+                    </span>
+
+                    <h2>
+                        Harry Potter y la piedra filosofal
+                    </h2>
+
+                    <p class="library-author">
+                        por J. K. Rowling
+                    </p>
+
+                    <p class="library-description">
+                        Un joven descubre que pertenece a un mundo
+                        mágico y comienza su aventura en Hogwarts.
+                    </p>
+
+                    <div class="library-rating">
+
+                        <span class="stars">
+                            ★★★★★
+                        </span>
+
+                        <span>
+                            4.9
+                        </span>
+
+                    </div>
+
+                    <div class="library-price">
+
+                        <span class="price-label">
+                            Comprar
+                        </span>
+
+                        <strong>
+                            $15.000
+                        </strong>
+
+                    </div>
+
+                    <a href="#" class="library-view-button">
+                        Ver libro
+                    </a>
+
+                </div>
+
+            </article>
+
+
+            <article class="library-book-card">
+
+                <a href="#" class="library-book-cover">
+
+                    <img src="/images/portada3.jpg"
+                         alt="Portada de Dune" />
+
+                </a>
+
+                <div class="library-book-content">
+
+                    <span class="library-category scifi">
+                        Ciencia ficción
+                    </span>
+
+                    <h2>
+                        Dune
+                    </h2>
+
+                    <p class="library-author">
+                        por Frank Herbert
+                    </p>
+
+                    <p class="library-description">
+                        Una familia noble se enfrenta a una lucha
+                        por el poder en un planeta desértico.
+                    </p>
+
+                    <div class="library-rating">
+
+                        <span class="stars">
+                            ★★★★★
+                        </span>
+
+                        <span>
+                            4.7
+                        </span>
+
+                    </div>
+
+                    <div class="library-price">
+
+                        <span class="price-label">
+                            Comprar
+                        </span>
+
+                        <strong>
+                            $20.000
+                        </strong>
+
+                    </div>
+
+                    <a href="#" class="library-view-button">
+                        Ver libro
+                    </a>
+
+                </div>
+
+            </article>
+
+
+            <article class="library-book-card">
+
+                <a href="#" class="library-book-cover">
+
+                    <img src="/images/portada4.jpg"
+                         alt="Portada de Drácula" />
+
+                </a>
+
+                <div class="library-book-content">
+
+                    <span class="library-category horror">
+                        Terror
+                    </span>
+
+                    <h2>
+                        Drácula
+                    </h2>
+
+                    <p class="library-author">
+                        por Bram Stoker
+                    </p>
+
+                    <p class="library-description">
+                        Una historia de misterio y terror alrededor
+                        del legendario conde de Transilvania.
+                    </p>
+
+                    <div class="library-rating">
+
+                        <span class="stars">
+                            ★★★★★
+                        </span>
+
+                        <span>
+                            4.5
+                        </span>
+
+                    </div>
+
+                    <div class="library-price">
+
+                        <span class="price-label">
+                            Comprar
+                        </span>
+
+                        <strong>
+                            $13.000
+                        </strong>
+
+                    </div>
+
+                    <a href="#" class="library-view-button">
+                        Ver libro
+                    </a>
+
+                </div>
+
+            </article>
+
+
+            <article class="library-book-card">
+
+                <a href="#" class="library-book-cover">
+
+                    <img src="/images/portada5.jpg"
+                         alt="Portada de Orgullo y prejuicio" />
+
+                </a>
+
+                <div class="library-book-content">
+
+                    <span class="library-category romance">
+                        Romance
+                    </span>
+
+                    <h2>
+                        Orgullo y prejuicio
+                    </h2>
+
+                    <p class="library-author">
+                        por Jane Austen
+                    </p>
+
+                    <p class="library-description">
+                        Elizabeth Bennet descubre que el amor puede
+                        aparecer en los lugares más inesperados.
+                    </p>
+
+                    <div class="library-rating">
+
+                        <span class="stars">
+                            ★★★★★
+                        </span>
+
+                        <span>
+                            4.6
+                        </span>
+
+                    </div>
+
+                    <div class="library-price">
+
+                        <span class="price-label">
+                            Comprar
+                        </span>
+
+                        <strong>
+                            $12.000
+                        </strong>
+
+                    </div>
+
+                    <a href="#" class="library-view-button">
+                        Ver libro
+                    </a>
+
+                </div>
+
+            </article>
+
+
+            <article class="library-book-card">
+
+                <a href="#" class="library-book-cover">
+
+                    <img src="/images/portada1.jpg"
+                         alt="Portada de El Principito" />
+
+                </a>
+
+                <div class="library-book-content">
+
+                    <span class="library-category mystery">
+                        Aventura
+                    </span>
+
+                    <h2>
+                        El Principito
+                    </h2>
+
+                    <p class="library-author">
+                        por Antoine de Saint-Exupéry
+                    </p>
+
+                    <p class="library-description">
+                        Un pequeño viajero recorre distintos mundos
+                        mientras descubre el verdadero significado de la vida.
+                    </p>
+
+                    <div class="library-rating">
+
+                        <span class="stars">
+                            ★★★★★
+                        </span>
+
+                        <span>
+                            4.9
+                        </span>
+
+                    </div>
+
+                    <div class="library-price">
+
+                        <span class="price-label">
+                            Comprar
+                        </span>
+
+                        <strong>
+                            $10.500
+                        </strong>
+
+                    </div>
+
+                    <a href="#" class="library-view-button">
+                        Ver libro
+                    </a>
+
+                </div>
+
+            </article>
+
+
+            <article class="library-book-card">
+
+                <a href="#" class="library-book-cover">
+
+                    <img src="/images/portada2.jpg"
+                         alt="Portada de 1984" />
+
+                </a>
+
+                <div class="library-book-content">
+
+                    <span class="library-category scifi">
+                        Ciencia ficción
+                    </span>
+
+                    <h2>
+                        1984
+                    </h2>
+
+                    <p class="library-author">
+                        por George Orwell
+                    </p>
+
+                    <p class="library-description">
+                        Una sociedad controlada por un poder absoluto
+                        donde hasta los pensamientos pueden ser vigilados.
+                    </p>
+
+                    <div class="library-rating">
+
+                        <span class="stars">
+                            ★★★★★
+                        </span>
+
+                        <span>
+                            4.7
+                        </span>
+
+                    </div>
+
+                    <div class="library-price">
+
+                        <span class="price-label">
+                            Comprar
+                        </span>
+
+                        <strong>
+                            $14.000
+                        </strong>
+
+                    </div>
+
+                    <a href="#" class="library-view-button">
+                        Ver libro
+                    </a>
+
+                </div>
+
+            </article>
+
+
+            <article class="library-book-card">
+
+                <a href="#" class="library-book-cover">
+
+                    <img src="/images/portada5.jpg"
+                         alt="Portada de El resplandor" />
+
+                </a>
+
+                <div class="library-book-content">
+
+                    <span class="library-category horror">
+                        Terror
+                    </span>
+
+                    <h2>
+                        El resplandor
+                    </h2>
+
+                    <p class="library-author">
+                        por Stephen King
+                    </p>
+
+                    <p class="library-description">
+                        Una familia llega a un hotel aislado donde
+                        comienzan a suceder hechos inexplicables.
+                    </p>
+
+                    <div class="library-rating">
+
+                        <span class="stars">
+                            ★★★★★
+                        </span>
+
+                        <span>
+                            4.8
+                        </span>
+
+                    </div>
+
+                    <div class="library-price">
+
+                        <span class="price-label">
+                            Comprar
+                        </span>
+
+                        <strong>
+                            $19.500
+                        </strong>
+
+                    </div>
+
+                    <a href="#" class="library-view-button">
+                        Ver libro
+                    </a>
+
+                </div>
+
+            </article>
+
+        </div>
+
+
+        <div class="library-pagination">
+
+            <button type="button" class="page-button active">
+                1
+            </button>
+
+            <button type="button" class="page-button">
+                2
+            </button>
+
+            <button type="button" class="page-button">
+                3
+            </button>
+
+            <button type="button" class="page-button">
+                →
+            </button>
+
+        </div>
+
+    </div>
+
+</div>

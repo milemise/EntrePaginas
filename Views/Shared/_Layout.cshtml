@@ -1,5 +1,4 @@
-﻿<!DOCTYPE html>
-<html lang="es">
+﻿<html lang="es">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -13,9 +12,62 @@
 
 <body>
 
+    <header class="layout-header">
+
+        <nav class="home-navbar">
+
+            <a class="brand" asp-controller="Home" asp-action="Index">
+
+                <img class="brand-logo"
+                     src="/images/logo.png"
+                     alt="logo">
+
+                <span>Entre Páginas</span>
+
+            </a>
+
+            <div class="nav-links">
+
+                <a asp-controller="Home" asp-action="Index">
+                    Inicio
+                </a>
+
+                <a asp-controller="Libros" asp-action="Index">
+                    Catálogo
+                </a>
+
+                <a href="#">
+                    Nosotros
+                </a>
+
+                <a href="#">
+                    Contacto
+                </a>
+
+            </div>
+
+            <div class="nav-actions">
+
+                <a href="#" class="btn-login">
+                    <span>♟</span>
+                    Iniciar sesión
+                </a>
+
+                <a href="#" class="btn-register">
+                    Registrarse
+                </a>
+
+            </div>
+
+        </nav>
+
+    </header>
+
+
     <main role="main">
         @RenderBody()
     </main>
+
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
