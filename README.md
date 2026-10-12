@@ -1,6 +1,6 @@
 # Entre Páginas — Plataforma de libros digitales
 
-**Entre Páginas** es una aplicación web desarrollada como proyecto integrador de la materia Programación Web. Su objetivo es ofrecer una plataforma para la publicación, compra, alquiler y lectura de libros digitales, con distintos permisos según el tipo de usuario.
+**Entre Páginas** es una aplicación web desarrollada como proyecto integrador. Su objetivo es ofrecer una plataforma para la publicación, compra, alquiler y lectura de libros digitales, con distintos permisos según el tipo de usuario.
 
 El sistema permite que los lectores accedan a un catálogo de libros, que los escritores publiquen y administren sus obras y que el administrador supervise los usuarios, las categorías y las reseñas.
 
