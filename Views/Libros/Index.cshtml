@@ -1,594 +1,78 @@
+@model LibroListadoViewModel
 @{
-    ViewData["Title"] = "Biblioteca";
+    ViewData["Title"] = "Catálogo";
+    string UrlConPagina(int pagina) => Url.Action("Index", new { buscar = Model.Buscar, categoriaId = Model.CategoriaId, ordenar = Model.Ordenar, pagina }) ?? "#";
 }
-
 <div class="library-page">
-
     <div class="library-container">
-
-        <div class="library-search">
-
-            <div class="library-search-input">
-
-                <span>⌕</span>
-
-                <input type="text"
-                       placeholder="Buscar un libro, autor o categoría..." />
-
-            </div>
-
-            <button type="button" class="library-search-button">
-                Buscar
-            </button>
-
+        <div class="library-header">
+            <span class="library-small-title">BIBLIOTECA DIGITAL</span>
+            <h1>Un mundo entre páginas</h1>
+            <p>Buscá tu próxima lectura entre las historias disponibles.</p>
         </div>
-
-
+        <form class="library-search" method="get" asp-controller="Libros" asp-action="Index">
+            <div class="library-search-input"><span>⌕</span><input type="search" name="buscar" value="@Model.Buscar" placeholder="Buscar por título, autor o descripción..." aria-label="Buscar libros" /></div>
+            <button type="submit" class="library-search-button">Buscar</button>
+        </form>
         <div class="library-filters">
-
-            <button type="button" class="library-filter active">
-                Todos
-            </button>
-
-            <button type="button" class="library-filter">
-                Fantasía
-            </button>
-
-            <button type="button" class="library-filter">
-                Romance
-            </button>
-
-            <button type="button" class="library-filter">
-                Terror
-            </button>
-
-            <button type="button" class="library-filter">
-                Ciencia ficción
-            </button>
-
-            <button type="button" class="library-filter">
-                Misterio
-            </button>
-
+            <a class="library-filter @(Model.CategoriaId == null ? "active" : "")" asp-action="Index" asp-route-buscar="@Model.Buscar" asp-route-ordenar="@Model.Ordenar">Todos</a>
+            @foreach (var categoria in Model.Categorias)
+            {
+                <a class="library-filter @(Model.CategoriaId == categoria.Id ? "active" : "")" asp-action="Index" asp-route-buscar="@Model.Buscar" asp-route-categoriaId="@categoria.Id" asp-route-ordenar="@Model.Ordenar">@categoria.Nombre</a>
+            }
         </div>
-
-
         <div class="library-results">
-
-            <span>
-                12 libros encontrados
-            </span>
-
-            <select class="library-order">
-
-                <option>Ordenar por</option>
-
-                <option>Precio menor</option>
-
-                <option>Precio mayor</option>
-
-                <option>Más vendidos</option>
-
-                <option>Mejor puntuados</option>
-
-            </select>
-
+            <span>@Model.TotalRegistros libros encontrados</span>
+            <form method="get" asp-action="Index" class="library-order-form">
+                <input type="hidden" name="buscar" value="@Model.Buscar" />
+                <input type="hidden" name="categoriaId" value="@Model.CategoriaId" />
+                <select class="library-order" name="ordenar" onchange="this.form.submit()" aria-label="Ordenar libros">
+                    <option value="" selected="@(string.IsNullOrEmpty(Model.Ordenar))">Orden alfabético</option>
+                    <option value="recientes" selected="@(Model.Ordenar == "recientes")">Más recientes</option>
+                    <option value="precio-menor" selected="@(Model.Ordenar == "precio-menor")">Precio menor</option>
+                    <option value="precio-mayor" selected="@(Model.Ordenar == "precio-mayor")">Precio mayor</option>
+                    <option value="puntuacion" selected="@(Model.Ordenar == "puntuacion")">Mejor puntuados</option>
+                </select>
+            </form>
         </div>
-
-
-        <div class="library-grid">
-
-
-            <article class="library-book-card">
-
-                <a href="#" class="library-book-cover">
-
-                    <img src="/images/portada1.jpg"
-                         alt="Portada de El Hobbit" />
-
-                </a>
-
-                <div class="library-book-content">
-
-                    <span class="library-category fantasy">
-                        Fantasía
-                    </span>
-
-                    <h2>
-                        El Hobbit
-                    </h2>
-
-                    <p class="library-author">
-                        por J. R. R. Tolkien
-                    </p>
-
-                    <p class="library-description">
-                        Bilbo Bolsón emprende una aventura inesperada
-                        que cambiará para siempre su tranquila vida.
-                    </p>
-
-                    <div class="library-rating">
-
-                        <span class="stars">
-                            ★★★★★
-                        </span>
-
-                        <span>
-                            4.8
-                        </span>
-
-                    </div>
-
-                    <div class="library-price">
-
-                        <span class="price-label">
-                            Comprar
-                        </span>
-
-                        <strong>
-                            $18.000
-                        </strong>
-
-                    </div>
-
-                    <a href="#" class="library-view-button">
-                        Ver libro
-                    </a>
-
-                </div>
-
-            </article>
-
-
-            <article class="library-book-card">
-
-                <a href="#" class="library-book-cover">
-
-                    <img src="/images/portada2.jpg"
-                         alt="Portada de Harry Potter" />
-
-                </a>
-
-                <div class="library-book-content">
-
-                    <span class="library-category fantasy">
-                        Fantasía
-                    </span>
-
-                    <h2>
-                        Harry Potter y la piedra filosofal
-                    </h2>
-
-                    <p class="library-author">
-                        por J. K. Rowling
-                    </p>
-
-                    <p class="library-description">
-                        Un joven descubre que pertenece a un mundo
-                        mágico y comienza su aventura en Hogwarts.
-                    </p>
-
-                    <div class="library-rating">
-
-                        <span class="stars">
-                            ★★★★★
-                        </span>
-
-                        <span>
-                            4.9
-                        </span>
-
-                    </div>
-
-                    <div class="library-price">
-
-                        <span class="price-label">
-                            Comprar
-                        </span>
-
-                        <strong>
-                            $15.000
-                        </strong>
-
-                    </div>
-
-                    <a href="#" class="library-view-button">
-                        Ver libro
-                    </a>
-
-                </div>
-
-            </article>
-
-
-            <article class="library-book-card">
-
-                <a href="#" class="library-book-cover">
-
-                    <img src="/images/portada3.jpg"
-                         alt="Portada de Dune" />
-
-                </a>
-
-                <div class="library-book-content">
-
-                    <span class="library-category scifi">
-                        Ciencia ficción
-                    </span>
-
-                    <h2>
-                        Dune
-                    </h2>
-
-                    <p class="library-author">
-                        por Frank Herbert
-                    </p>
-
-                    <p class="library-description">
-                        Una familia noble se enfrenta a una lucha
-                        por el poder en un planeta desértico.
-                    </p>
-
-                    <div class="library-rating">
-
-                        <span class="stars">
-                            ★★★★★
-                        </span>
-
-                        <span>
-                            4.7
-                        </span>
-
-                    </div>
-
-                    <div class="library-price">
-
-                        <span class="price-label">
-                            Comprar
-                        </span>
-
-                        <strong>
-                            $20.000
-                        </strong>
-
-                    </div>
-
-                    <a href="#" class="library-view-button">
-                        Ver libro
-                    </a>
-
-                </div>
-
-            </article>
-
-
-            <article class="library-book-card">
-
-                <a href="#" class="library-book-cover">
-
-                    <img src="/images/portada4.jpg"
-                         alt="Portada de Drácula" />
-
-                </a>
-
-                <div class="library-book-content">
-
-                    <span class="library-category horror">
-                        Terror
-                    </span>
-
-                    <h2>
-                        Drácula
-                    </h2>
-
-                    <p class="library-author">
-                        por Bram Stoker
-                    </p>
-
-                    <p class="library-description">
-                        Una historia de misterio y terror alrededor
-                        del legendario conde de Transilvania.
-                    </p>
-
-                    <div class="library-rating">
-
-                        <span class="stars">
-                            ★★★★★
-                        </span>
-
-                        <span>
-                            4.5
-                        </span>
-
-                    </div>
-
-                    <div class="library-price">
-
-                        <span class="price-label">
-                            Comprar
-                        </span>
-
-                        <strong>
-                            $13.000
-                        </strong>
-
-                    </div>
-
-                    <a href="#" class="library-view-button">
-                        Ver libro
-                    </a>
-
-                </div>
-
-            </article>
-
-
-            <article class="library-book-card">
-
-                <a href="#" class="library-book-cover">
-
-                    <img src="/images/portada5.jpg"
-                         alt="Portada de Orgullo y prejuicio" />
-
-                </a>
-
-                <div class="library-book-content">
-
-                    <span class="library-category romance">
-                        Romance
-                    </span>
-
-                    <h2>
-                        Orgullo y prejuicio
-                    </h2>
-
-                    <p class="library-author">
-                        por Jane Austen
-                    </p>
-
-                    <p class="library-description">
-                        Elizabeth Bennet descubre que el amor puede
-                        aparecer en los lugares más inesperados.
-                    </p>
-
-                    <div class="library-rating">
-
-                        <span class="stars">
-                            ★★★★★
-                        </span>
-
-                        <span>
-                            4.6
-                        </span>
-
-                    </div>
-
-                    <div class="library-price">
-
-                        <span class="price-label">
-                            Comprar
-                        </span>
-
-                        <strong>
-                            $12.000
-                        </strong>
-
-                    </div>
-
-                    <a href="#" class="library-view-button">
-                        Ver libro
-                    </a>
-
-                </div>
-
-            </article>
-
-
-            <article class="library-book-card">
-
-                <a href="#" class="library-book-cover">
-
-                    <img src="/images/portada1.jpg"
-                         alt="Portada de El Principito" />
-
-                </a>
-
-                <div class="library-book-content">
-
-                    <span class="library-category mystery">
-                        Aventura
-                    </span>
-
-                    <h2>
-                        El Principito
-                    </h2>
-
-                    <p class="library-author">
-                        por Antoine de Saint-Exupéry
-                    </p>
-
-                    <p class="library-description">
-                        Un pequeño viajero recorre distintos mundos
-                        mientras descubre el verdadero significado de la vida.
-                    </p>
-
-                    <div class="library-rating">
-
-                        <span class="stars">
-                            ★★★★★
-                        </span>
-
-                        <span>
-                            4.9
-                        </span>
-
-                    </div>
-
-                    <div class="library-price">
-
-                        <span class="price-label">
-                            Comprar
-                        </span>
-
-                        <strong>
-                            $10.500
-                        </strong>
-
-                    </div>
-
-                    <a href="#" class="library-view-button">
-                        Ver libro
-                    </a>
-
-                </div>
-
-            </article>
-
-
-            <article class="library-book-card">
-
-                <a href="#" class="library-book-cover">
-
-                    <img src="/images/portada2.jpg"
-                         alt="Portada de 1984" />
-
-                </a>
-
-                <div class="library-book-content">
-
-                    <span class="library-category scifi">
-                        Ciencia ficción
-                    </span>
-
-                    <h2>
-                        1984
-                    </h2>
-
-                    <p class="library-author">
-                        por George Orwell
-                    </p>
-
-                    <p class="library-description">
-                        Una sociedad controlada por un poder absoluto
-                        donde hasta los pensamientos pueden ser vigilados.
-                    </p>
-
-                    <div class="library-rating">
-
-                        <span class="stars">
-                            ★★★★★
-                        </span>
-
-                        <span>
-                            4.7
-                        </span>
-
-                    </div>
-
-                    <div class="library-price">
-
-                        <span class="price-label">
-                            Comprar
-                        </span>
-
-                        <strong>
-                            $14.000
-                        </strong>
-
-                    </div>
-
-                    <a href="#" class="library-view-button">
-                        Ver libro
-                    </a>
-
-                </div>
-
-            </article>
-
-
-            <article class="library-book-card">
-
-                <a href="#" class="library-book-cover">
-
-                    <img src="/images/portada5.jpg"
-                         alt="Portada de El resplandor" />
-
-                </a>
-
-                <div class="library-book-content">
-
-                    <span class="library-category horror">
-                        Terror
-                    </span>
-
-                    <h2>
-                        El resplandor
-                    </h2>
-
-                    <p class="library-author">
-                        por Stephen King
-                    </p>
-
-                    <p class="library-description">
-                        Una familia llega a un hotel aislado donde
-                        comienzan a suceder hechos inexplicables.
-                    </p>
-
-                    <div class="library-rating">
-
-                        <span class="stars">
-                            ★★★★★
-                        </span>
-
-                        <span>
-                            4.8
-                        </span>
-
-                    </div>
-
-                    <div class="library-price">
-
-                        <span class="price-label">
-                            Comprar
-                        </span>
-
-                        <strong>
-                            $19.500
-                        </strong>
-
-                    </div>
-
-                    <a href="#" class="library-view-button">
-                        Ver libro
-                    </a>
-
-                </div>
-
-            </article>
-
-        </div>
-
-
-        <div class="library-pagination">
-
-            <button type="button" class="page-button active">
-                1
-            </button>
-
-            <button type="button" class="page-button">
-                2
-            </button>
-
-            <button type="button" class="page-button">
-                3
-            </button>
-
-            <button type="button" class="page-button">
-                →
-            </button>
-
-        </div>
-
+        @if (Model.Libros.Count == 0)
+        {
+            <div class="empty-state"><h2>No encontramos libros con esa búsqueda</h2><p>Probá con otro título, autor o género.</p><a asp-action="Index" class="book-button">Limpiar filtros</a></div>
+        }
+        else
+        {
+            <div class="library-grid">
+                @foreach (var libro in Model.Libros)
+                {
+                    var portada = string.IsNullOrWhiteSpace(libro.PortadaUrl) ? Url.Content("~/images/portada1.jpg") : (libro.PortadaUrl.StartsWith("https://", StringComparison.OrdinalIgnoreCase) ? libro.PortadaUrl : Url.Content("~/" + libro.PortadaUrl.TrimStart('/')));
+                    Model.ResumenResenas.TryGetValue(libro.Id, out var resumen);
+                    var promedio = resumen?.Promedio ?? 0;
+                    var cantidadResenas = resumen?.Cantidad ?? 0;
+                    <article class="library-book-card">
+                        <a asp-action="Detalle" asp-route-id="@libro.Id" class="library-book-cover"><img src="@portada" alt="Portada de @libro.Titulo" loading="lazy" /></a>
+                        <div class="library-book-content">
+                            <span class="library-category">@libro.Categoria.Nombre</span>
+                            <h2><a asp-action="Detalle" asp-route-id="@libro.Id">@libro.Titulo</a></h2>
+                            <p class="library-author">por @(string.IsNullOrWhiteSpace(libro.Autor) ? $"{libro.Escritor.Nombre} {libro.Escritor.Apellido}" : libro.Autor)</p>
+                            <p class="library-description">@(string.IsNullOrWhiteSpace(libro.Descripcion) ? "Una historia para descubrir." : libro.Descripcion)</p>
+                            <div class="library-rating"><span class="stars">@(promedio == 0 ? "☆☆☆☆☆" : new string('★', (int)Math.Round(promedio)))</span><span>@(cantidadResenas == 0 ? "Sin reseñas" : promedio.ToString("0.0"))</span></div>
+                            <div class="library-price"><span class="price-label">Comprar</span><strong>@libro.PrecioCompra.ToString("C0", System.Globalization.CultureInfo.GetCultureInfo("es-AR"))</strong></div>
+                            <a asp-action="Detalle" asp-route-id="@libro.Id" class="library-view-button">Ver libro</a>
+                        </div>
+                    </article>
+                }
+            </div>
+            @if (Model.TotalPaginas > 1)
+            {
+                <nav class="library-pagination" aria-label="Paginación del catálogo">
+                    @if (Model.Pagina > 1) { <a href="@UrlConPagina(Model.Pagina - 1)">← Anterior</a> }
+                    @for (var p = Math.Max(1, Model.Pagina - 2); p <= Math.Min(Model.TotalPaginas, Model.Pagina + 2); p++)
+                    {
+                        <a href="@UrlConPagina(p)" class="@(p == Model.Pagina ? "active" : "")" aria-current="@(p == Model.Pagina ? "page" : null)">@p</a>
+                    }
+                    @if (Model.Pagina < Model.TotalPaginas) { <a href="@UrlConPagina(Model.Pagina + 1)">Siguiente →</a> }
+                </nav>
+            }
+        }
     </div>
-
 </div>

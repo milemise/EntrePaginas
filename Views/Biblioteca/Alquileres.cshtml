@@ -1,0 +1,24 @@
+@model IReadOnlyList<Alquiler>
+@{
+    ViewData["Title"] = "Mis alquileres";
+}
+<div class="management-page"><div class="management-container">
+    <header class="management-header"><span class="library-small-title">TU BIBLIOTECA PERSONAL</span><h1>Mis alquileres</h1><p>Los alquileres dan acceso a lectura online hasta su fecha de vencimiento, pero no habilitan la descarga.</p></header>
+    <div class="library-filters"><a asp-action="Compras" class="library-filter">Compras</a><a asp-action="Alquileres" class="library-filter active">Alquileres</a></div>
+    @if (Model.Count == 0)
+    {
+        <div class="management-card empty-state"><h2>No tenés alquileres todavía</h2><p>Alquilá un libro para leerlo online durante el período elegido.</p><a class="detail-primary-button" asp-controller="Libros" asp-action="Index">Explorar catálogo</a></div>
+    }
+    else
+    {
+        <section class="management-card"><div class="table-responsive"><table class="table management-table align-middle"><thead><tr><th>Libro</th><th>Inicio</th><th>Vencimiento</th><th>Importe</th><th>Estado</th><th></th></tr></thead><tbody>
+        @foreach (var alquiler in Model)
+        {
+            var vigente = alquiler.Activo && alquiler.FechaInicio <= DateTime.Now && alquiler.FechaHasta >= DateTime.Now;
+            <tr><td><strong><a asp-controller="Libros" asp-action="Detalle" asp-route-id="@alquiler.IdLibro">@alquiler.Libro.Titulo</a></strong><small class="d-block text-muted">@(alquiler.Libro.Autor ?? "Autor no indicado")</small></td><td>@alquiler.FechaInicio.ToString("dd/MM/yyyy")</td><td>@alquiler.FechaHasta.ToString("dd/MM/yyyy")</td><td>@alquiler.Importe.ToString("C2", System.Globalization.CultureInfo.GetCultureInfo("es-AR"))</td><td>@if (vigente) { <span class="status-pill status-success">Vigente</span> } else { <span class="status-pill status-muted">Vencido</span> }</td><td>@if (vigente) { <a class="detail-secondary-button" asp-controller="Libros" asp-action="Leer" asp-route-id="@alquiler.IdLibro">Leer online</a> }</td></tr>
+        }
+        </tbody></table></div>
+        @if ((int)ViewBag.TotalPaginas > 1) { <nav class="library-pagination">@if ((int)ViewBag.Pagina > 1) { <a asp-route-pagina="@((int)ViewBag.Pagina - 1)">← Anterior</a> }<span>Página @ViewBag.Pagina de @ViewBag.TotalPaginas</span>@if ((int)ViewBag.Pagina < (int)ViewBag.TotalPaginas) { <a asp-route-pagina="@((int)ViewBag.Pagina + 1)">Siguiente →</a> }</nav> }
+        </section>
+    }
+</div></div>

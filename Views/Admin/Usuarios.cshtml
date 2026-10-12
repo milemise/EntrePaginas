@@ -1,0 +1,17 @@
+@model UsuariosAdminViewModel
+@{
+    ViewData["Title"] = "Administrar usuarios";
+}
+<div class="management-page"><div class="management-container">
+    <a asp-action="Index" class="detail-back">← Panel de administración</a>
+    <header class="management-header"><span class="library-small-title">ADMINISTRACIÓN</span><h1>Usuarios y roles</h1><p>@Model.TotalRegistros cuentas registradas. Los cambios de rol se aplican al próximo acceso del usuario.</p></header>
+    <form method="get" asp-action="Usuarios" class="admin-search-form"><input class="form-control" name="buscar" value="@Model.Buscar" placeholder="Buscar por nombre, usuario o correo..." /><button class="detail-secondary-button" type="submit">Buscar</button></form>
+    <section class="management-card"><div class="table-responsive"><table class="table management-table align-middle"><thead><tr><th>Usuario</th><th>Correo</th><th>Rol actual</th><th>Actualizar rol</th><th></th></tr></thead><tbody>
+    @foreach (var usuario in Model.Usuarios)
+    {
+        <tr><td><strong>@usuario.Nombre @usuario.Apellido</strong><small class="d-block text-muted">@@@usuario.NombreUsuario · DNI @usuario.Dni</small></td><td>@usuario.Email</td><td><span class="role-pill">@usuario.Rol</span></td><td><form asp-action="CambiarRol" method="post" class="role-change-form"><input type="hidden" name="id" value="@usuario.Id" /><select name="rol" class="form-select" aria-label="Nuevo rol para @usuario.NombreUsuario"><option value="Lector" selected="@(usuario.Rol == "Lector")">Lector</option><option value="Escritor" selected="@(usuario.Rol == "Escritor")">Escritor</option><option value="Administrador" selected="@(usuario.Rol == "Administrador")">Administrador</option></select><button class="btn btn-sm btn-outline-primary" type="submit" disabled="@(usuario.Id == int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? "0" ) )">Guardar</button></form></td><td><form asp-action="EliminarUsuario" method="post" onsubmit="return confirm('¿Eliminar esta cuenta? Solo se permite si no tiene relaciones asociadas.');"><input type="hidden" name="id" value="@usuario.Id" /><button type="submit" class="btn btn-sm btn-outline-danger" disabled="@(usuario.Id == int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? "0"))">Eliminar</button></form></td></tr>
+    }
+    </tbody></table></div>
+    @if (Model.TotalPaginas > 1) { <nav class="library-pagination">@if (Model.Pagina > 1) { <a asp-route-buscar="@Model.Buscar" asp-route-pagina="@(Model.Pagina - 1)">← Anterior</a> }<span>Página @Model.Pagina de @Model.TotalPaginas</span>@if (Model.Pagina < Model.TotalPaginas) { <a asp-route-buscar="@Model.Buscar" asp-route-pagina="@(Model.Pagina + 1)">Siguiente →</a> }</nav> }
+    </section>
+</div></div>

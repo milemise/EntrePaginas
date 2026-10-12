@@ -1,0 +1,27 @@
+@model LibroListadoViewModel
+@{
+    ViewData["Title"] = "Mis libros";
+}
+<div class="management-page"><div class="management-container">
+    <header class="management-header"><span class="library-small-title">ESPACIO DE ESCRITORES</span><h1>Mis libros</h1><p>Administrá tus obras publicadas y revisá cómo aparecen en el catálogo.</p></header>
+    <div class="management-toolbar"><span>@Model.TotalRegistros obras registradas</span><div><a class="detail-secondary-button" asp-controller="Escritores" asp-action="Estadisticas">Ver estadísticas</a><a class="detail-primary-button" asp-action="Crear">+ Publicar libro</a></div></div>
+    <section class="management-card">
+        @if (Model.Libros.Count == 0)
+        {
+            <div class="empty-state"><h2>Todavía no publicaste libros</h2><p>Usá el buscador de Open Library para ayudarte a completar los datos de tu primera obra.</p><a class="detail-primary-button" asp-action="Crear">Publicar mi primer libro</a></div>
+        }
+        else
+        {
+            <div class="table-responsive"><table class="table management-table align-middle"><thead><tr><th>Libro</th><th>Categoría</th><th>Compra</th><th>Alquiler</th><th>Acciones</th></tr></thead><tbody>
+            @foreach (var libro in Model.Libros)
+            {
+                <tr><td><strong>@libro.Titulo</strong><small class="d-block text-muted">@(libro.Autor ?? "Autor no indicado") @if (libro.EsMas18) { <span class="age-badge">+18</span> }</small></td><td>@libro.Categoria.Nombre</td><td>@libro.PrecioCompra.ToString("C0", System.Globalization.CultureInfo.GetCultureInfo("es-AR"))</td><td>@libro.PrecioAlquiler.ToString("C0", System.Globalization.CultureInfo.GetCultureInfo("es-AR"))</td><td><div class="row-actions"><a asp-action="Detalle" asp-route-id="@libro.Id">Ver</a><a asp-action="Editar" asp-route-id="@libro.Id">Editar</a><form asp-action="Eliminar" asp-route-id="@libro.Id" method="post" onsubmit="return confirm('¿Eliminar este libro? Solo se puede borrar si no tiene movimientos ni reseñas.');"><button type="submit">Eliminar</button></form></div></td></tr>
+            }
+            </tbody></table></div>
+            @if (Model.TotalPaginas > 1)
+            {
+                <nav class="library-pagination" aria-label="Paginación de mis libros">@if (Model.Pagina > 1) { <a asp-route-pagina="@(Model.Pagina - 1)">← Anterior</a> }<span>Página @Model.Pagina de @Model.TotalPaginas</span>@if (Model.Pagina < Model.TotalPaginas) { <a asp-route-pagina="@(Model.Pagina + 1)">Siguiente →</a> }</nav>
+            }
+        }
+    </section>
+</div></div>

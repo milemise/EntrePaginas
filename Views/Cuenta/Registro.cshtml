@@ -1,0 +1,28 @@
+@model RegistroViewModel
+@{
+    ViewData["Title"] = "Crear cuenta";
+}
+<section class="account-page">
+    <div class="account-card account-card-wide">
+        <div class="account-emblem"><img src="~/images/logo.png" alt="Entre Páginas" /></div>
+        <span class="library-small-title">TU PRÓXIMA HISTORIA EMPIEZA ACÁ</span>
+        <h1>Crear una cuenta</h1>
+        <p>Registrate para leer, comprar o compartir tus propias obras.</p>
+        <form asp-action="Registro" method="post" class="account-form account-form-grid">
+            <div asp-validation-summary="ModelOnly" class="text-danger form-grid-full"></div>
+            <div><label asp-for="Nombre"></label><input asp-for="Nombre" autocomplete="given-name" /><span asp-validation-for="Nombre" class="text-danger"></span></div>
+            <div><label asp-for="Apellido"></label><input asp-for="Apellido" autocomplete="family-name" /><span asp-validation-for="Apellido" class="text-danger"></span></div>
+            <div><label asp-for="NombreUsuario"></label><input asp-for="NombreUsuario" autocomplete="username" /><span asp-validation-for="NombreUsuario" class="text-danger"></span></div>
+            <div><label asp-for="Email"></label><input asp-for="Email" autocomplete="email" /><span asp-validation-for="Email" class="text-danger"></span></div>
+            <div><label asp-for="Dni"></label><input asp-for="Dni" /><span asp-validation-for="Dni" class="text-danger"></span></div>
+            <div><label asp-for="Telefono"></label><input asp-for="Telefono" autocomplete="tel" /><span asp-validation-for="Telefono" class="text-danger"></span></div>
+            <div><label asp-for="FechaNacimiento"></label><input asp-for="FechaNacimiento" type="date" max="@DateTime.Today.ToString("yyyy-MM-dd")" /><span asp-validation-for="FechaNacimiento" class="text-danger"></span></div>
+            <div><label asp-for="TipoCuenta">Quiero registrarme como</label><select asp-for="TipoCuenta"><option value="Lector">Lector/a</option><option value="Escritor">Escritor/a</option></select><span asp-validation-for="TipoCuenta" class="text-danger"></span></div>
+            <div><label asp-for="Password"></label><input asp-for="Password" autocomplete="new-password" /><span asp-validation-for="Password" class="text-danger"></span></div>
+            <div><label asp-for="ConfirmarPassword"></label><input asp-for="ConfirmarPassword" autocomplete="new-password" /><span asp-validation-for="ConfirmarPassword" class="text-danger"></span></div>
+            <div class="form-grid-full"><button type="submit" class="detail-primary-button">Crear mi cuenta</button></div>
+        </form>
+        <p class="account-switch">¿Ya tenés cuenta? <a asp-action="Login">Iniciá sesión</a></p>
+    </div>
+</section>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

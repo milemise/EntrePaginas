@@ -1,79 +1,82 @@
-﻿<html lang="es">
+@using System.Security.Claims
+<!DOCTYPE html>
+<html lang="es">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
     <title>@ViewData["Title"] - Entre Páginas</title>
-
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/EntrePaginas.styles.css" asp-append-version="true" />
 </head>
-
 <body>
-
     <header class="layout-header">
-
         <nav class="home-navbar">
-
             <a class="brand" asp-controller="Home" asp-action="Index">
-
-                <img class="brand-logo"
-                     src="/images/logo.png"
-                     alt="logo">
-
+                <img class="brand-logo" src="~/images/logo.png" alt="Logo de Entre Páginas" />
                 <span>Entre Páginas</span>
-
             </a>
-
             <div class="nav-links">
-
-                <a asp-controller="Home" asp-action="Index">
-                    Inicio
-                </a>
-
-                <a asp-controller="Libros" asp-action="Index">
-                    Catálogo
-                </a>
-
-                <a href="#">
-                    Nosotros
-                </a>
-
-                <a href="#">
-                    Contacto
-                </a>
-
+                <a asp-controller="Home" asp-action="Index">Inicio</a>
+                <a asp-controller="Libros" asp-action="Index">Catálogo</a>
+                @if (User.Identity?.IsAuthenticated == true && User.IsInRole("Lector"))
+                {
+                    <a asp-controller="Biblioteca" asp-action="Compras">Mi biblioteca</a>
+                }
+                @if (User.IsInRole("Escritor"))
+                {
+                    <a asp-controller="Libros" asp-action="MisLibros">Mis libros</a>
+                    <a asp-controller="Escritores" asp-action="Estadisticas">Estadísticas</a>
+                }
+                @if (User.IsInRole("Administrador"))
+                {
+                    <a asp-controller="Admin" asp-action="Index">Administración</a>
+                }
             </div>
-
             <div class="nav-actions">
-
-                <a href="#" class="btn-login">
-                    <span>♟</span>
-                    Iniciar sesión
-                </a>
-
-                <a href="#" class="btn-register">
-                    Registrarse
-                </a>
-
+                @if (User.Identity?.IsAuthenticated == true)
+                {
+                    var avatar = User.FindFirst("avatar_url")?.Value;
+                    <a asp-controller="Cuenta" asp-action="Perfil" class="account-link">
+                        @if (!string.IsNullOrWhiteSpace(avatar))
+                        {
+                            <img class="nav-avatar" src="@Url.Content("~/" + avatar.TrimStart('/'))" alt="Avatar" />
+                        }
+                        else
+                        {
+                            <span class="account-avatar-placeholder">♟</span>
+                        }
+                        <span>@(User.FindFirst("nombre_completo")?.Value ?? User.Identity?.Name)</span>
+                    </a>
+                    <form asp-controller="Cuenta" asp-action="Logout" method="post" class="logout-form">
+                        <button type="submit" class="btn-login">Cerrar sesión</button>
+                    </form>
+                }
+                else
+                {
+                    <a asp-controller="Cuenta" asp-action="Login" class="btn-login"><span>♟</span> Iniciar sesión</a>
+                    <a asp-controller="Cuenta" asp-action="Registro" class="btn-register">Registrarse</a>
+                }
             </div>
-
         </nav>
-
     </header>
-
-
+    @if (TempData["Mensaje"] is string mensaje)
+    {
+        <div class="container mt-3"><div class="alert alert-success alert-dismissible fade show" role="alert">@mensaje<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button></div></div>
+    }
+    @if (TempData["Error"] is string error)
+    {
+        <div class="container mt-3"><div class="alert alert-warning alert-dismissible fade show" role="alert">@error<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button></div></div>
+    }
     <main role="main">
         @RenderBody()
     </main>
-
-
+    <footer class="site-footer">
+        <div class="footer-inner"><span>Entre Páginas</span><span>Donde cada historia encuentra a su lector</span><a asp-controller="Home" asp-action="Privacy">Privacidad</a></div>
+    </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
-
     @await RenderSectionAsync("Scripts", required: false)
-
 </body>
 </html>

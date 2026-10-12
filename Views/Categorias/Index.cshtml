@@ -1,0 +1,68 @@
+@{
+    ViewData["Title"] = "Gestión de categorías";
+}
+<div class="management-page"><div class="management-container">
+    <header class="management-header"><span class="library-small-title">PANEL DE ADMINISTRACIÓN</span><h1>Gestión de categorías</h1><p>Creá, editá y eliminá géneros. Esta pantalla funciona como un módulo SPA: consulta y modifica los datos por AJAX sin recargar la página.</p></header>
+    <section id="categoriasApp" class="management-card vue-panel" v-cloak>
+        <div style="display:none">@Html.AntiForgeryToken()</div>
+        <div class="vue-panel-heading"><div><h2>Categorías</h2><span>{{ categorias.length }} cargadas</span></div><button type="button" class="detail-primary-button" v-if="!editando" v-on:click="limpiar">+ Nueva categoría</button></div>
+        <div v-if="mensaje" class="alert alert-success" role="status">{{ mensaje }}</div>
+        <div v-if="error" class="alert alert-danger" role="alert">{{ error }}</div>
+        <form class="category-editor" v-on:submit.prevent="guardar" v-if="mostrarFormulario">
+            <label for="nombreCategoria">Nombre de la categoría</label>
+            <div class="category-editor-row"><input id="nombreCategoria" class="form-control" v-model.trim="nombre" maxlength="100" required placeholder="Ej.: Ciencia ficción" /><button class="detail-primary-button" type="submit" :disabled="guardando">{{ guardando ? 'Guardando...' : (editando ? 'Guardar cambios' : 'Crear categoría') }}</button><button class="detail-secondary-button" type="button" v-on:click="cancelar">Cancelar</button></div>
+        </form>
+        <div v-if="cargando" class="muted-note">Cargando categorías...</div>
+        <div v-else-if="categorias.length === 0" class="empty-state compact-empty"><h3>No hay categorías</h3><p>Creá la primera para que los escritores puedan clasificar sus obras.</p></div>
+        <div v-else class="table-responsive"><table class="table management-table align-middle"><thead><tr><th>Nombre</th><th>Libros asociados</th><th>Acciones</th></tr></thead><tbody><tr v-for="categoria in categorias" :key="categoria.id"><td><strong>{{ categoria.nombre }}</strong></td><td>{{ categoria.cantidadLibros }}</td><td><div class="row-actions"><button type="button" v-on:click="editar(categoria)">Editar</button><button type="button" class="danger-action" v-on:click="eliminar(categoria)">Eliminar</button></div></td></tr></tbody></table></div>
+    </section>
+</div></div>
+@section Scripts {
+    <script src="@Url.Content("~/lib/vue.global.js")"></script>
+    <script>
+        const { createApp } = Vue;
+        createApp({
+            data() { return { categorias: [], nombre: '', idEditando: null, cargando: false, guardando: false, mostrarFormulario: false, mensaje: '', error: '' }; },
+            computed: { editando() { return this.idEditando !== null; } },
+            mounted() { this.cargar(); },
+            methods: {
+                token() { return document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''; },
+                async peticion(url, options = {}) {
+                    const headers = { 'Accept': 'application/json', ...(options.headers || {}) };
+                    if (options.method && options.method !== 'GET') { headers['Content-Type'] = 'application/json'; headers['RequestVerificationToken'] = this.token(); }
+                    const response = await fetch(url, { credentials: 'same-origin', ...options, headers });
+                    if (response.status === 204) return null;
+                    const data = await response.json().catch(() => ({}));
+                    if (!response.ok) throw new Error(data.mensaje || 'No se pudo completar la operación.');
+                    return data;
+                },
+                async cargar() {
+                    this.cargando = true; this.error = '';
+                    try { this.categorias = await this.peticion('/ajax/categorias'); }
+                    catch (e) { this.error = e.message; }
+                    finally { this.cargando = false; }
+                },
+                limpiar() { this.idEditando = null; this.nombre = ''; this.mostrarFormulario = true; this.mensaje = ''; this.error = ''; this.$nextTick(() => document.getElementById('nombreCategoria')?.focus()); },
+                editar(categoria) { this.idEditando = categoria.id; this.nombre = categoria.nombre; this.mostrarFormulario = true; this.mensaje = ''; this.error = ''; this.$nextTick(() => document.getElementById('nombreCategoria')?.focus()); },
+                cancelar() { this.mostrarFormulario = false; this.idEditando = null; this.nombre = ''; this.error = ''; },
+                async guardar() {
+                    if (!this.nombre.trim()) { this.error = 'Ingresá un nombre.'; return; }
+                    this.guardando = true; this.error = ''; this.mensaje = '';
+                    try {
+                        const editing = this.editando;
+                        await this.peticion(editing ? `/ajax/categorias/${this.idEditando}` : '/ajax/categorias', { method: editing ? 'PUT' : 'POST', body: JSON.stringify({ nombre: this.nombre.trim() }) });
+                        this.mensaje = editing ? 'La categoría se actualizó.' : 'La categoría se creó.';
+                        this.cancelar(); await this.cargar();
+                    } catch (e) { this.error = e.message; }
+                    finally { this.guardando = false; }
+                },
+                async eliminar(categoria) {
+                    if (!confirm(`¿Eliminar la categoría “${categoria.nombre}”?`)) return;
+                    this.error = ''; this.mensaje = '';
+                    try { await this.peticion(`/ajax/categorias/${categoria.id}`, { method: 'DELETE' }); this.mensaje = 'La categoría se eliminó.'; await this.cargar(); }
+                    catch (e) { this.error = e.message; }
+                }
+            }
+        }).mount('#categoriasApp');
+    </script>
+}

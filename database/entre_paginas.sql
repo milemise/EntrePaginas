@@ -72,6 +72,8 @@ CREATE TABLE `compras` (
 CREATE TABLE `libros` (
   `id` int(11) NOT NULL,
   `titulo` varchar(200) NOT NULL,
+  `autor` varchar(200) DEFAULT NULL,
+  `open_library_key` varchar(100) DEFAULT NULL,
   `descripcion` text DEFAULT NULL,
   `portada_url` varchar(500) DEFAULT NULL,
   `archivo_url` varchar(500) DEFAULT NULL,

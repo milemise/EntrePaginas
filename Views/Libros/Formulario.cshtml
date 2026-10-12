@@ -1,0 +1,119 @@
+@model LibroFormViewModel
+@{
+    var editando = Model.Id > 0;
+    ViewData["Title"] = editando ? "Editar libro" : "Publicar libro";
+    var categorias = ViewBag.Categorias as IReadOnlyList<Categoria> ?? Array.Empty<Categoria>();
+    var tituloAnterior = ViewBag.TituloAnterior as string ?? Model.LibroAnteriorTitulo;
+}
+<div class="management-page">
+    <div class="management-container">
+        <a asp-action="MisLibros" class="detail-back">← Volver a mis libros</a>
+        <header class="management-header"><span class="library-small-title">ESPACIO DE ESCRITORES</span><h1>@(editando ? "Editar obra" : "Publicar una nueva obra")</h1><p>Completá los datos de tu libro y subí el archivo que estará disponible para los lectores.</p></header>
+        <div class="editor-layout">
+            <section class="management-card">
+                <form asp-action="@(editando ? "Editar" : "Crear")" asp-route-id="@Model.Id" method="post" enctype="multipart/form-data" class="editor-form">
+                    <input asp-for="Id" type="hidden" /><input asp-for="OpenLibraryKey" type="hidden" id="OpenLibraryKey" /><input asp-for="PortadaUrl" type="hidden" id="PortadaUrl" />
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+                    <div class="editor-section"><h2>Información del libro</h2>
+                        <div><label asp-for="Titulo"></label><input asp-for="Titulo" class="form-control" /><span asp-validation-for="Titulo" class="text-danger"></span></div>
+                        <div><label asp-for="Autor">Autor/a</label><input asp-for="Autor" class="form-control" placeholder="Nombre del autor original" /><span asp-validation-for="Autor" class="text-danger"></span></div>
+                        <div><label asp-for="Descripcion"></label><textarea asp-for="Descripcion" class="form-control" rows="5" placeholder="Contá de qué trata la obra..."></textarea><span asp-validation-for="Descripcion" class="text-danger"></span></div>
+                        <div><label asp-for="IdCategoria">Categoría</label><select asp-for="IdCategoria" class="form-select"><option value="">Seleccionar una categoría</option>@foreach (var categoria in categorias) { <option value="@categoria.Id">@categoria.Nombre</option> }</select><span asp-validation-for="IdCategoria" class="text-danger"></span></div>
+                    </div>
+                    <div class="editor-section"><h2>Archivos</h2>
+                        <div><label for="Portada">Portada (JPG, PNG o WebP; hasta 5 MB)</label><input asp-for="Portada" type="file" class="form-control" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" /><span asp-validation-for="Portada" class="text-danger"></span>@if (!string.IsNullOrWhiteSpace(Model.PortadaUrl)) { <small>La portada actual se conserva si no seleccionás otra.</small> }</div>
+                        <div><label for="Archivo">Archivo del libro (PDF, DOC o DOCX; hasta 30 MB) @(editando ? "— opcional si conservás el archivo actual" : "— obligatorio")</label><input asp-for="Archivo" type="file" class="form-control" accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" /><span asp-validation-for="Archivo" class="text-danger"></span></div>
+                    </div>
+                    <div class="editor-section"><h2>Precios y acceso</h2>
+                        <div class="editor-two-cols"><div><label asp-for="PrecioCompra">Precio de compra ($)</label><input asp-for="PrecioCompra" class="form-control" min="0" step="0.01" /><span asp-validation-for="PrecioCompra" class="text-danger"></span></div><div><label asp-for="PrecioAlquiler">Precio de alquiler ($)</label><input asp-for="PrecioAlquiler" class="form-control" min="0" step="0.01" /><span asp-validation-for="PrecioAlquiler" class="text-danger"></span></div></div>
+                        <label class="inline-check"><input asp-for="EsMas18" /> Esta obra es exclusiva para mayores de 18 años (+18)</label>
+                    </div>
+                    <div class="editor-section"><h2>Relacionar una saga (opcional)</h2>
+                        <p class="muted-note">Buscá un libro tuyo para marcarlo como la entrega anterior.</p>
+                        <label for="SagaBusqueda">Buscar una obra anterior</label><input id="SagaBusqueda" class="form-control" type="search" autocomplete="off" placeholder="Escribí al menos 2 caracteres..." />
+                        <div id="SagaResultados" class="lookup-results" aria-live="polite"></div>
+                        <input asp-for="IdLibroAnterior" type="hidden" id="IdLibroAnterior" />
+                        <div id="SagaSeleccionada" class="selected-related">@(Model.IdLibroAnterior.HasValue ? $"Libro anterior seleccionado: {tituloAnterior ?? "obra existente"}" : "No hay un libro anterior seleccionado.")</div>
+                        <button type="button" id="LimpiarSaga" class="btn btn-sm btn-outline-secondary mt-2">Quitar relación</button>
+                    </div>
+                    <div class="editor-actions"><button type="submit" class="detail-primary-button">@(editando ? "Guardar cambios" : "Publicar libro")</button><a asp-action="MisLibros" class="detail-secondary-button">Cancelar</a></div>
+                </form>
+            </section>
+            <aside class="management-card openlibrary-card">
+                <span class="library-small-title">ASISTENTE DE METADATOS</span><h2>Buscar en Open Library</h2>
+                <p>Encontrá una ficha para completar título, autor, descripción y portada. Después revisá los datos y adjuntá tu propio archivo.</p>
+                <div class="openlibrary-search"><input id="OpenLibraryBusqueda" type="search" class="form-control" placeholder="Título o autor..." /><button id="BuscarOpenLibrary" type="button" class="detail-secondary-button">Buscar</button></div>
+                <div id="OpenLibraryEstado" class="muted-note" aria-live="polite">La búsqueda se realiza cuando la solicitás, no al cargar la página.</div>
+                <div id="OpenLibraryResultados" class="openlibrary-results"></div>
+                <small class="openlibrary-attribution">Metadatos y cubiertas de Open Library. Los resultados pueden contener información incompleta; verificá siempre los datos.</small>
+            </aside>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        (() => {
+            const olInput = document.getElementById('OpenLibraryBusqueda');
+            const olButton = document.getElementById('BuscarOpenLibrary');
+            const olResults = document.getElementById('OpenLibraryResultados');
+            const olStatus = document.getElementById('OpenLibraryEstado');
+            const sagaInput = document.getElementById('SagaBusqueda');
+            const sagaResults = document.getElementById('SagaResultados');
+            const sagaId = document.getElementById('IdLibroAnterior');
+            const sagaSelected = document.getElementById('SagaSeleccionada');
+            const antiForgery = document.querySelector('input[name="__RequestVerificationToken"]')?.value;
+
+            const esc = value => String(value ?? '').replace(/[&<>"']/g, ch => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[ch]));
+
+            olButton?.addEventListener('click', async () => {
+                const term = olInput.value.trim();
+                if (term.length < 2) { olStatus.textContent = 'Ingresá al menos 2 caracteres.'; return; }
+                olButton.disabled = true;
+                olStatus.textContent = 'Buscando en Open Library...';
+                olResults.innerHTML = '';
+                try {
+                    const response = await fetch(`/Libros/BuscarOpenLibrary?termino=${encodeURIComponent(term)}`, { headers: { 'Accept':'application/json' } });
+                    const data = await response.json();
+                    if (!response.ok) throw new Error(data.mensaje || 'No se pudo consultar Open Library.');
+                    if (!data.items?.length) { olStatus.textContent = 'No encontramos coincidencias. Podés completar los campos a mano.'; return; }
+                    olStatus.textContent = `${data.items.length} resultados. Seleccioná uno para usar sus metadatos.`;
+                    olResults.innerHTML = data.items.map((book, i) => `<article class="openlibrary-result"><div class="openlibrary-thumb">${book.portadaUrl ? `<img src="${esc(book.portadaUrl)}" alt="" loading="lazy">` : '<span>📚</span>'}</div><div class="openlibrary-result-text"><strong>${esc(book.titulo)}</strong><span>${esc(book.autor)}${book.anioPublicacion ? ` · ${esc(book.anioPublicacion)}` : ''}</span><button type="button" class="btn btn-sm btn-outline-secondary use-openlibrary" data-index="${i}">Usar estos datos</button></div></article>`).join('');
+                    olResults.querySelectorAll('.use-openlibrary').forEach(btn => btn.addEventListener('click', () => {
+                        const b = data.items[Number(btn.dataset.index)];
+                        document.getElementById('Titulo').value = b.titulo || '';
+                        document.getElementById('Autor').value = b.autor === 'Autor no informado' ? '' : (b.autor || '');
+                        if (b.descripcion && !document.getElementById('Descripcion').value) document.getElementById('Descripcion').value = b.descripcion;
+                        document.getElementById('OpenLibraryKey').value = b.key || '';
+                        const cover = document.getElementById('PortadaUrl');
+                        if (cover && b.portadaUrl) cover.value = b.portadaUrl;
+                        olStatus.textContent = 'Metadatos cargados en el formulario. Revisalos antes de guardar y adjuntá el archivo de la obra.';
+                    }));
+                } catch (error) { olStatus.textContent = error.message || 'Error en la búsqueda.'; }
+                finally { olButton.disabled = false; }
+            });
+            olInput?.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); olButton.click(); } });
+
+            let sagaTimer;
+            sagaInput?.addEventListener('input', () => {
+                clearTimeout(sagaTimer);
+                const term = sagaInput.value.trim();
+                if (term.length < 2) { sagaResults.innerHTML = ''; return; }
+                sagaTimer = setTimeout(async () => {
+                    try {
+                        const response = await fetch(`/Libros/BuscarRelacionados?termino=${encodeURIComponent(term)}`, { headers: { 'Accept':'application/json' } });
+                        const data = await response.json();
+                        sagaResults.innerHTML = data.items?.length ? data.items.map(item => `<button type="button" class="lookup-result" data-id="${item.id}" data-title="${esc(item.titulo)}">${esc(item.titulo)}</button>`).join('') : '<p class="muted-note">No encontramos obras con ese título.</p>';
+                        sagaResults.querySelectorAll('.lookup-result').forEach(btn => btn.addEventListener('click', () => {
+                            sagaId.value = btn.dataset.id;
+                            sagaSelected.textContent = `Libro anterior seleccionado: ${btn.dataset.title}`;
+                            sagaResults.innerHTML = '';
+                            sagaInput.value = btn.dataset.title;
+                        }));
+                    } catch { sagaResults.innerHTML = '<p class="text-danger">No se pudo buscar la obra anterior.</p>'; }
+                }, 250);
+            });
+            document.getElementById('LimpiarSaga')?.addEventListener('click', () => { sagaId.value = ''; sagaInput.value = ''; sagaResults.innerHTML = ''; sagaSelected.textContent = 'No hay un libro anterior seleccionado.'; });
+        })();
+    </script>
+}

@@ -1,0 +1,14 @@
+@{
+    ViewData["Title"] = "Administración";
+}
+<div class="management-page"><div class="management-container">
+    <header class="management-header"><span class="library-small-title">ENTRE PÁGINAS</span><h1>Panel de administración</h1><p>Revisá la actividad general y gestioná los datos principales de la plataforma.</p></header>
+    <div class="admin-stat-grid">
+        <article class="admin-stat-card"><span>Usuarios</span><strong>@ViewBag.Usuarios</strong><a asp-action="Usuarios">Gestionar usuarios →</a></article>
+        <article class="admin-stat-card"><span>Libros publicados</span><strong>@ViewBag.Libros</strong><a asp-controller="Libros" asp-action="Index">Ver catálogo →</a></article>
+        <article class="admin-stat-card"><span>Compras registradas</span><strong>@ViewBag.Compras</strong><small>Transacciones en la base de datos</small></article>
+        <article class="admin-stat-card"><span>Alquileres</span><strong>@ViewBag.Alquileres</strong><small>Alquileres registrados</small></article>
+        <article class="admin-stat-card admin-stat-feature"><span>Reseñas reportadas</span><strong>@ViewBag.ResenasReportadas</strong><a asp-action="ResenasReportadas">Revisar reportes →</a></article>
+    </div>
+    <section class="management-card admin-shortcuts"><h2>Accesos rápidos</h2><a asp-controller="Categorias" asp-action="Index">Administrar categorías</a><a asp-action="Usuarios">Administrar usuarios y roles</a><a asp-action="ResenasReportadas">Moderar reseñas reportadas</a></section>
+</div></div>

@@ -1,0 +1,22 @@
+@model LoginViewModel
+@{
+    ViewData["Title"] = "Iniciar sesión";
+}
+<section class="account-page">
+    <div class="account-card">
+        <div class="account-emblem"><img src="~/images/logo.png" alt="Entre Páginas" /></div>
+        <span class="library-small-title">QUÉ BUENO TENERTE DE VUELTA</span>
+        <h1>Iniciar sesión</h1>
+        <p>Volvé a tus historias favoritas.</p>
+        <form asp-action="Login" method="post" class="account-form">
+            <input type="hidden" name="returnUrl" value="@ViewData["ReturnUrl"]" />
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <label asp-for="Usuario"></label><input asp-for="Usuario" autocomplete="username" /><span asp-validation-for="Usuario" class="text-danger"></span>
+            <label asp-for="Password"></label><input asp-for="Password" autocomplete="current-password" /><span asp-validation-for="Password" class="text-danger"></span>
+            <label class="inline-check"><input asp-for="Recordarme" /> Recordarme en este dispositivo</label>
+            <button type="submit" class="detail-primary-button">Entrar a mi cuenta</button>
+        </form>
+        <p class="account-switch">¿Todavía no tenés cuenta? <a asp-action="Registro">Registrate</a></p>
+    </div>
+</section>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

@@ -1,0 +1,18 @@
+@model EstadisticasEscritorViewModel
+@{
+    ViewData["Title"] = "Estadísticas";
+}
+<div class="management-page"><div class="management-container">
+    <header class="management-header"><span class="library-small-title">ESPACIO DE ESCRITORES</span><h1>Estadísticas de tus obras</h1><p>Resumen de compras, alquileres e importes asociados a tus libros publicados.</p></header>
+    <div class="admin-stat-grid">
+        <article class="admin-stat-card"><span>Obras publicadas</span><strong>@Model.LibrosPublicados</strong><a asp-controller="Libros" asp-action="MisLibros">Gestionar obras →</a></article>
+        <article class="admin-stat-card"><span>Compras no devueltas</span><strong>@Model.Ventas</strong><small>Operaciones registradas</small></article>
+        <article class="admin-stat-card"><span>Alquileres vigentes</span><strong>@Model.Alquileres</strong><small>Alquileres activos</small></article>
+        <article class="admin-stat-card"><span>Ingresos por compras</span><strong>@Model.IngresosVentas.ToString("C0", System.Globalization.CultureInfo.GetCultureInfo("es-AR"))</strong><small>Antes de comisiones</small></article>
+        <article class="admin-stat-card"><span>Ingresos por alquiler</span><strong>@Model.IngresosAlquileres.ToString("C0", System.Globalization.CultureInfo.GetCultureInfo("es-AR"))</strong><small>Antes de comisiones</small></article>
+    </div>
+    <section class="management-card"><h2>Detalle por libro</h2>
+        @if (Model.Libros.Count == 0) { <p class="muted-note">Publicá tu primera obra para comenzar a ver estadísticas.</p> }
+        else { <div class="table-responsive"><table class="table management-table"><thead><tr><th>Libro</th><th>Compras</th><th>Alquileres</th><th>Ingresos estimados</th></tr></thead><tbody>@foreach (var item in Model.Libros) { <tr><td><a asp-controller="Libros" asp-action="Detalle" asp-route-id="@item.Id">@item.Titulo</a></td><td>@item.Ventas</td><td>@item.Alquileres</td><td>@item.Ingresos.ToString("C0", System.Globalization.CultureInfo.GetCultureInfo("es-AR"))</td></tr> }</tbody></table></div> }
+    </section>
+</div></div>

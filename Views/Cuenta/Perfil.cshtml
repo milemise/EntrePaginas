@@ -1,0 +1,29 @@
+@model PerfilViewModel
+@{
+    ViewData["Title"] = "Mi perfil";
+    var avatar = string.IsNullOrWhiteSpace(Model.AvatarUrl) ? null : Url.Content("~/" + Model.AvatarUrl.TrimStart('/'));
+}
+<section class="account-page">
+    <div class="account-card account-card-wide profile-card">
+        <span class="library-small-title">TU CUENTA</span>
+        <h1>Mi perfil</h1>
+        <p>Actualizá tus datos y personalizá tu avatar.</p>
+        <div class="profile-heading">
+            @if (avatar is not null) { <img src="@avatar" class="profile-avatar" alt="Avatar de @Model.NombreUsuario" /> }
+            else { <div class="profile-avatar profile-avatar-empty">♟</div> }
+            <div><h2>@Model.Nombre @Model.Apellido</h2><span class="role-pill">@Model.Rol</span><p>Usuario: @Model.NombreUsuario</p></div>
+        </div>
+        <form asp-action="Perfil" method="post" enctype="multipart/form-data" class="account-form account-form-grid">
+            <input asp-for="Id" type="hidden" /><input asp-for="Rol" type="hidden" /><input asp-for="AvatarUrl" type="hidden" />
+            <div asp-validation-summary="ModelOnly" class="text-danger form-grid-full"></div>
+            <div><label asp-for="Nombre"></label><input asp-for="Nombre" /><span asp-validation-for="Nombre" class="text-danger"></span></div>
+            <div><label asp-for="Apellido"></label><input asp-for="Apellido" /><span asp-validation-for="Apellido" class="text-danger"></span></div>
+            <div><label asp-for="NombreUsuario"></label><input asp-for="NombreUsuario" /><span asp-validation-for="NombreUsuario" class="text-danger"></span></div>
+            <div><label asp-for="Email"></label><input asp-for="Email" /><span asp-validation-for="Email" class="text-danger"></span></div>
+            <div><label asp-for="Telefono"></label><input asp-for="Telefono" /><span asp-validation-for="Telefono" class="text-danger"></span></div>
+            <div><label for="Avatar">Nuevo avatar (JPG, PNG o WebP; hasta 4 MB)</label><input asp-for="Avatar" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" /><span asp-validation-for="Avatar" class="text-danger"></span></div>
+            <div class="form-grid-full"><button type="submit" class="detail-primary-button">Guardar cambios</button></div>
+        </form>
+    </div>
+</section>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

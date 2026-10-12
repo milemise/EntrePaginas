@@ -1,0 +1,23 @@
+@model IReadOnlyList<Compra>
+@{
+    ViewData["Title"] = "Mis compras";
+}
+<div class="management-page"><div class="management-container">
+    <header class="management-header"><span class="library-small-title">TU BIBLIOTECA PERSONAL</span><h1>Mis compras</h1><p>Los libros que compraste están acá. La descarga solo está disponible mientras la compra no haya sido devuelta.</p></header>
+    <div class="library-filters"><a asp-action="Compras" class="library-filter active">Compras</a><a asp-action="Alquileres" class="library-filter">Alquileres</a></div>
+    @if (Model.Count == 0)
+    {
+        <div class="management-card empty-state"><h2>Todavía no compraste libros</h2><p>Explorá el catálogo para encontrar tu próxima lectura.</p><a class="detail-primary-button" asp-controller="Libros" asp-action="Index">Explorar catálogo</a></div>
+    }
+    else
+    {
+        <section class="management-card"><div class="table-responsive"><table class="table management-table align-middle"><thead><tr><th>Libro</th><th>Fecha</th><th>Importe</th><th>Estado</th><th>Acciones</th></tr></thead><tbody>
+        @foreach (var compra in Model)
+        {
+            <tr><td><strong><a asp-controller="Libros" asp-action="Detalle" asp-route-id="@compra.IdLibro">@compra.Libro.Titulo</a></strong><small class="d-block text-muted">@(compra.Libro.Autor ?? "Autor no indicado")</small></td><td>@compra.FechaCompra.ToString("dd/MM/yyyy")</td><td>@compra.Importe.ToString("C2", System.Globalization.CultureInfo.GetCultureInfo("es-AR"))</td><td>@if (compra.Devuelto) { <span class="status-pill status-muted">Devuelto</span> } else { <span class="status-pill status-success">Disponible</span> }</td><td><div class="row-actions">@if (!compra.Devuelto) { <a asp-controller="Libros" asp-action="Descargar" asp-route-id="@compra.IdLibro">Descargar</a> @if (DateTime.Now <= compra.FechaCompra.AddDays(7)) { <form asp-controller="Libros" asp-action="DevolverCompra" method="post" onsubmit="return confirm('¿Querés devolver esta compra? Vas a perder el acceso al archivo.');"><input type="hidden" name="id" value="@compra.Id" /><button type="submit">Devolver</button></form> } }</div><small class="d-block text-muted">@if (!compra.Devuelto && DateTime.Now <= compra.FechaCompra.AddDays(7)) { <text>Disponible para devolución hasta @compra.FechaCompra.AddDays(7).ToString("dd/MM/yyyy")</text> }</small></td></tr>
+        }
+        </tbody></table></div>
+        @if ((int)ViewBag.TotalPaginas > 1) { <nav class="library-pagination">@if ((int)ViewBag.Pagina > 1) { <a asp-route-pagina="@((int)ViewBag.Pagina - 1)">← Anterior</a> }<span>Página @ViewBag.Pagina de @ViewBag.TotalPaginas</span>@if ((int)ViewBag.Pagina < (int)ViewBag.TotalPaginas) { <a asp-route-pagina="@((int)ViewBag.Pagina + 1)">Siguiente →</a> }</nav> }
+        </section>
+    }
+</div></div>
