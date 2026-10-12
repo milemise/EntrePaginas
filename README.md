@@ -18,7 +18,6 @@ Aplicación web educativa desarrollada con **ASP.NET Core MVC, C#, Entity Framew
 5. El proyecto viene configurado para MariaDB 10.4.32. Para MySQL, cambiá `Database:ServerType` a `MySQL` y `Database:ServerVersion` a la versión instalada (por ejemplo, `8.0.36`).
 6. La aplicación ejecuta un inicializador al arrancar: agrega `autor` y `open_library_key` si faltan, y carga cuentas, categorías y libros de muestra cuando corresponda.
 
-> Si la base ya tiene las columnas `autor` y `open_library_key`, no necesitás ejecutar `database/actualizar_v2_openlibrary.sql`. Ese archivo es una alternativa manual para una base anterior; ejecutalo una sola vez y solo si esas columnas no existen.
 
 ## 3. Ejecutar
 
