@@ -42,6 +42,16 @@ El proyecto está desarrollado con ASP.NET Core MVC y C#, con persistencia media
 
 Las operaciones restringidas se validan en el backend mediante autenticación y autorización por roles, no solamente ocultando opciones en la interfaz.
 
+# Usuarios:
+Usuario escritor: Luu 
+Contraseña: 12345678
+
+Usuario lector: Mile
+Contraseña: 12345678
+
+Usuario administrador: Ad  
+Contraseña: administrador
+
 ## 2. Modelo de datos y persistencia
 
 La base de datos se llama `entre_paginas` y está diseñada para funcionar con MySQL o MariaDB.

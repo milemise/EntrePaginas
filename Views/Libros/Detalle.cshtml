@@ -2,8 +2,23 @@
 @{
     ViewData["Title"] = Model.Libro.Titulo;
     var libro = Model.Libro;
-    var portada = string.IsNullOrWhiteSpace(libro.PortadaUrl) ? Url.Content("~/images/portada1.jpg") : (libro.PortadaUrl.StartsWith("https://", StringComparison.OrdinalIgnoreCase) ? libro.PortadaUrl : Url.Content("~/" + libro.PortadaUrl.TrimStart('/')));
+    var portada = string.IsNullOrWhiteSpace(libro.PortadaUrl)
+        ? Url.Content("~/images/portada1.jpg")
+        : (libro.PortadaUrl.StartsWith("https://", StringComparison.OrdinalIgnoreCase)
+            ? libro.PortadaUrl
+            : Url.Content("~/" + libro.PortadaUrl.TrimStart('/')));
+
     var promedio = Model.PromedioResenas;
+
+    var usuarioActualId = int.TryParse(
+        User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value,
+        out var idUsuario)
+        ? idUsuario
+        : 0;
+
+    var esMiLibro = User.Identity?.IsAuthenticated == true
+        && usuarioActualId != 0
+        && usuarioActualId == libro.IdEscritor;
 }
 <div class="detail-page">
     <div class="detail-container">
@@ -33,37 +48,87 @@
                 </div>
                 @if (Model.ContenidoBloqueado)
                 {
-                    <div class="alert alert-warning mt-3">@Model.MotivoBloqueo</div>
-                }
-                else if (User.IsInRole("Lector"))
-                {
-                    <div class="detail-actions">
-                        @if (Model.PuedeComprar)
-                        {
-                            <form asp-action="Comprar" method="post"><input type="hidden" name="id" value="@libro.Id" /><button class="detail-primary-button" type="submit">Comprar libro</button></form>
-                        }
-                        else if (Model.CompraVigente)
-                        {
-                            <a class="detail-primary-button" asp-controller="Biblioteca" asp-action="Compras">Ya está en mi biblioteca</a>
-                        }
-                        @if (Model.PuedeAlquilar)
-                        {
-                            <form asp-action="Alquilar" method="post" class="rent-form"><input type="hidden" name="id" value="@libro.Id" /><label for="dias">Duración</label><select name="dias" id="dias"><option value="7">7 días</option><option value="15">15 días</option><option value="30">30 días</option></select><button type="submit" class="detail-secondary-button">Alquilar</button></form>
-                        }
-                        @if (Model.AlquilerVigente)
-                        {
-                            <a class="detail-secondary-button" asp-action="Leer" asp-route-id="@libro.Id">Leer online</a>
-                        }
-                        @if (Model.CompraVigente)
-                        {
-                            <a class="detail-secondary-button" asp-action="Descargar" asp-route-id="@libro.Id">Descargar libro</a>
-                        }
+                    <div class="alert alert-warning mt-3">
+                        @Model.MotivoBloqueo
                     </div>
                 }
-                else if (User.Identity?.IsAuthenticated != true)
+                else if (User.Identity?.IsAuthenticated == true)
                 {
-                    <p class="login-prompt"><a asp-controller="Cuenta" asp-action="Login" asp-route-returnUrl="@Context.Request.Path">Iniciá sesión</a> para comprar o alquilar este libro.</p>
+                    @if (esMiLibro)
+                    {
+                        <div class="alert alert-info mt-3">
+                            Este es tu propio libro. No podés comprarlo ni alquilarlo.
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="detail-actions">
+                            @if (Model.PuedeComprar)
+                            {
+                                <form asp-action="Comprar" method="post">
+                                    <input type="hidden" name="id" value="@libro.Id" />
+                                    <button class="detail-primary-button" type="submit">
+                                        Comprar libro
+                                    </button>
+                                </form>
+                            }
+                            else if (Model.CompraVigente)
+                            {
+                                <a class="detail-primary-button"
+                                asp-controller="Biblioteca"
+                                asp-action="Compras">
+                                    Ya está en mi biblioteca
+                                </a>
+                            }
+
+                            @if (Model.PuedeAlquilar)
+                            {
+                                <form asp-action="Alquilar" method="post" class="rent-form">
+                                    <input type="hidden" name="id" value="@libro.Id" />
+                                    <label for="dias">Duración</label>
+                                    <select name="dias" id="dias">
+                                        <option value="7">7 días</option>
+                                        <option value="15">15 días</option>
+                                        <option value="30">30 días</option>
+                                    </select>
+                                    <button type="submit" class="detail-secondary-button">
+                                        Alquilar
+                                    </button>
+                                </form>
+                            }
+
+                            @if (Model.AlquilerVigente)
+                            {
+                                <a class="detail-secondary-button"
+                                asp-action="Leer"
+                                asp-route-id="@libro.Id">
+                                    Leer online
+                                </a>
+                            }
+
+                            @if (Model.CompraVigente)
+                            {
+                                <a class="detail-secondary-button"
+                                asp-action="Descargar"
+                                asp-route-id="@libro.Id">
+                                    Descargar libro
+                                </a>
+                            }
+                        </div>
+                    }
                 }
+                else
+                {
+                    <p class="login-prompt">
+                        <a asp-controller="Cuenta"
+                        asp-action="Login"
+                        asp-route-returnUrl="@Context.Request.Path">
+                            Iniciá sesión
+                        </a>
+                        para comprar o alquilar este libro.
+                    </p>
+                }
+
             </section>
         </div>
         <section class="reviews-section">
@@ -72,10 +137,46 @@
             {
                 <form asp-controller="Resenas" asp-action="Crear" method="post" class="review-form">
                     <input type="hidden" name="IdLibro" value="@libro.Id" />
-                    <div class="review-form-top"><label for="Puntuacion">Tu puntuación</label><select name="Puntuacion" id="Puntuacion"><option value="5">5 — Excelente</option><option value="4">4 — Muy bueno</option><option value="3">3 — Bueno</option><option value="2">2 — Regular</option><option value="1">1 — No me gustó</option></select></div>
-                    <label for="Comentario">Tu reseña</label><textarea id="Comentario" name="Comentario" rows="3" maxlength="3000" placeholder="¿Qué te pareció esta historia?"></textarea>
-                    <label class="anonymous-check"><input type="checkbox" name="Anonimo" value="true" /> Publicar de forma anónima</label>
-                    <button type="submit" class="detail-primary-button">Publicar reseña</button>
+
+                    <div class="review-rating-field">
+                        <label class="rating-title">Tu puntuación</label>
+
+                        <div class="star-rating" role="radiogroup" aria-label="Elegí una puntuación">
+                            <input type="radio" id="estrella5" name="Puntuacion" value="5" required />
+                            <label for="estrella5" title="5 estrellas">★</label>
+
+                            <input type="radio" id="estrella4" name="Puntuacion" value="4" />
+                            <label for="estrella4" title="4 estrellas">★</label>
+
+                            <input type="radio" id="estrella3" name="Puntuacion" value="3" />
+                            <label for="estrella3" title="3 estrellas">★</label>
+
+                            <input type="radio" id="estrella2" name="Puntuacion" value="2" />
+                            <label for="estrella2" title="2 estrellas">★</label>
+
+                            <input type="radio" id="estrella1" name="Puntuacion" value="1" />
+                            <label for="estrella1" title="1 estrella">★</label>
+                        </div>
+
+                        <span class="rating-hint">Seleccioná de 1 a 5 estrellas</span>
+                    </div>
+
+                    <label for="Comentario">Tu reseña</label>
+                    <textarea
+                        id="Comentario"
+                        name="Comentario"
+                        rows="3"
+                        maxlength="3000"
+                        placeholder="¿Qué te pareció esta historia?"></textarea>
+
+                    <label class="anonymous-check">
+                        <input type="checkbox" name="Anonimo" value="true" />
+                        Publicar de forma anónima
+                    </label>
+
+                    <button type="submit" class="detail-primary-button">
+                        Publicar reseña
+                    </button>
                 </form>
             }
             else if (Model.MiResenaId is not null)

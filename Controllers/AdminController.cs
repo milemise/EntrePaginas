@@ -93,6 +93,65 @@ public class AdminController : Controller
     }
 
     [HttpGet]
+    public IActionResult CrearAdministrador()
+    {
+        return View(new Usuario());
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> CrearAdministrador(Usuario model)
+    {
+        ModelState.Remove(nameof(Usuario.Rol));
+        model.Nombre = model.Nombre.Trim();
+        model.Apellido = model.Apellido.Trim();
+        model.NombreUsuario = model.NombreUsuario.Trim();
+        model.Email = model.Email.Trim();
+        model.Dni = model.Dni.Trim();
+        model.Telefono = model.Telefono?.Trim();
+
+        if (await _context.Usuarios.AnyAsync(x =>
+            x.NombreUsuario == model.NombreUsuario))
+        {
+            ModelState.AddModelError(
+                nameof(model.NombreUsuario),
+                "Ese nombre de usuario ya está registrado.");
+        }
+
+        if (await _context.Usuarios.AnyAsync(x =>
+            x.Email == model.Email))
+        {
+            ModelState.AddModelError(
+                nameof(model.Email),
+                "Ese correo electrónico ya está registrado.");
+        }
+
+        if (await _context.Usuarios.AnyAsync(x =>
+            x.Dni == model.Dni))
+        {
+            ModelState.AddModelError(
+                nameof(model.Dni),
+                "Ya existe una cuenta registrada con ese DNI.");
+        }
+
+        if (!ModelState.IsValid)
+        {
+            return View(model);
+        }
+
+        model.Id = 0;
+        model.AvatarUrl = null;
+        model.Rol = RolesAplicacion.Administrador;
+        model.Password = BCrypt.Net.BCrypt.HashPassword(model.Password);
+
+        _context.Usuarios.Add(model);
+        await _context.SaveChangesAsync();
+
+        TempData["Mensaje"] = "El administrador se creó correctamente.";
+
+        return RedirectToAction(nameof(Usuarios));
+    }
+
+    [HttpGet]
     public async Task<IActionResult> ResenasReportadas(int pagina = 1)
     {
         pagina = Math.Max(1, pagina);

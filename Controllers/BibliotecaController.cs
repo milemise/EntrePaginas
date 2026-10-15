@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EntrePaginas.Controllers;
 
-[Authorize(Roles = RolesAplicacion.Lector)]
+[Authorize]
 public class BibliotecaController : Controller
 {
     private const int TamanoPagina = 10;

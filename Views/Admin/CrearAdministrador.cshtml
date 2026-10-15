@@ -1,0 +1,158 @@
+@model EntrePaginas.Models.Usuario
+
+@{
+    ViewData["Title"] = "Crear administrador";
+}
+
+<div class="management-page">
+    <div class="management-container">
+
+        <a asp-action="Usuarios" class="detail-back">
+            ← Volver a usuarios y roles
+        </a>
+
+        <header class="management-header">
+            <span class="library-small-title">ADMINISTRACIÓN</span>
+            <h1>Crear administrador</h1>
+            <p>
+                Completá los datos para registrar una nueva cuenta
+                con permisos de administración.
+            </p>
+        </header>
+
+        <section class="management-card admin-create-card">
+
+            <form asp-controller="Admin"
+                  asp-action="CrearAdministrador"
+                  method="post"
+                  class="admin-create-form">
+
+                <div asp-validation-summary="ModelOnly"
+                     class="text-danger"></div>
+
+                <h2>Datos personales</h2>
+
+                <div class="admin-form-grid">
+
+                    <div class="admin-form-field">
+                        <label asp-for="Nombre">Nombre</label>
+                        <input asp-for="Nombre"
+                               class="form-control"
+                               placeholder="Nombre"
+                               required />
+                        <span asp-validation-for="Nombre"
+                              class="text-danger"></span>
+                    </div>
+
+                    <div class="admin-form-field">
+                        <label asp-for="Apellido">Apellido</label>
+                        <input asp-for="Apellido"
+                               class="form-control"
+                               placeholder="Apellido"
+                               required />
+                        <span asp-validation-for="Apellido"
+                              class="text-danger"></span>
+                    </div>
+
+                    <div class="admin-form-field">
+                        <label asp-for="Dni">DNI</label>
+                        <input asp-for="Dni"
+                               class="form-control"
+                               placeholder="Número de documento"
+                               required />
+                        <span asp-validation-for="Dni"
+                              class="text-danger"></span>
+                    </div>
+
+                    <div class="admin-form-field">
+                        <label asp-for="FechaNacimiento">
+                            Fecha de nacimiento
+                        </label>
+                        <input asp-for="FechaNacimiento"
+                               type="date"
+                               class="form-control"
+                               required />
+                        <span asp-validation-for="FechaNacimiento"
+                              class="text-danger"></span>
+                    </div>
+
+                    <div class="admin-form-field">
+                        <label asp-for="Telefono">Teléfono</label>
+                        <input asp-for="Telefono"
+                               class="form-control"
+                               placeholder="Número de teléfono"
+                               required />
+                        <span asp-validation-for="Telefono"
+                              class="text-danger"></span>
+                    </div>
+
+                </div>
+
+                <h2>Datos de la cuenta</h2>
+
+                <div class="admin-form-grid">
+
+                    <div class="admin-form-field">
+                        <label asp-for="NombreUsuario">
+                            Nombre de usuario
+                        </label>
+                        <input asp-for="NombreUsuario"
+                               class="form-control"
+                               placeholder="Elegí un nombre de usuario"
+                               required />
+                        <span asp-validation-for="NombreUsuario"
+                              class="text-danger"></span>
+                    </div>
+
+                    <div class="admin-form-field">
+                        <label asp-for="Email">Correo electrónico</label>
+                        <input asp-for="Email"
+                               type="email"
+                               class="form-control"
+                               placeholder="correo@ejemplo.com"
+                               required />
+                        <span asp-validation-for="Email"
+                              class="text-danger"></span>
+                    </div>
+
+                    <div class="admin-form-field admin-form-full">
+                        <label asp-for="Password">Contraseña</label>
+                        <input asp-for="Password"
+                               type="password"
+                               class="form-control"
+                               placeholder="Ingresá una contraseña"
+                               autocomplete="new-password"
+                               required />
+                        <span asp-validation-for="Password"
+                              class="text-danger"></span>
+                    </div>
+
+                </div>
+
+                <div class="admin-role-notice">
+                    <strong>Rol asignado automáticamente</strong>
+                    <p>
+                        Esta cuenta se creará con el rol
+                        <strong>Administrador</strong>.
+                        Tendrá acceso a las funciones de administración
+                        del sitio.
+                    </p>
+                </div>
+
+                <div class="admin-form-actions">
+                    <a asp-action="Usuarios"
+                       class="detail-secondary-button">
+                        Cancelar
+                    </a>
+
+                    <button type="submit"
+                            class="detail-primary-button">
+                        Crear administrador
+                    </button>
+                </div>
+
+            </form>
+
+        </section>
+    </div>
+</div>

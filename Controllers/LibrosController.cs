@@ -83,12 +83,14 @@ public class LibrosController : Controller
         var compraVigente = false;
         var alquilerVigente = false;
         var yaCompro = false;
+        var esLibroPropio = false;
         var puedeResenar = false;
         int? miResenaId = null;
         if (User.Identity?.IsAuthenticated == true && int.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var usuarioId))
         {
             var usuario = await _context.Usuarios.AsNoTracking().FirstOrDefaultAsync(x => x.Id == usuarioId);
             if (usuario is null) return Challenge();
+            esLibroPropio = libro.IdEscritor == usuarioId;
             if (libro.EsMas18 && CalcularEdad(usuario.FechaNacimiento) < 18)
             {
                 bloqueado = true;
@@ -97,17 +99,17 @@ public class LibrosController : Controller
             compraVigente = await _context.Compras.AnyAsync(x => x.IdLibro == id && x.IdLector == usuarioId && !x.Devuelto);
             alquilerVigente = await _context.Alquileres.AnyAsync(x => x.IdLibro == id && x.IdLector == usuarioId && x.Activo && x.FechaInicio <= DateTime.Now && x.FechaHasta >= DateTime.Now);
             yaCompro = compraVigente;
-            puedeResenar = User.IsInRole(RolesAplicacion.Lector) &&
-                (await _context.Compras.AnyAsync(x => x.IdLibro == id && x.IdLector == usuarioId) ||
-                 await _context.Alquileres.AnyAsync(x => x.IdLibro == id && x.IdLector == usuarioId));
+            puedeResenar =
+                await _context.Compras.AnyAsync(x => x.IdLibro == id && x.IdLector == usuarioId && !x.Devuelto) ||
+                await _context.Alquileres.AnyAsync(x => x.IdLibro == id && x.IdLector == usuarioId && x.Activo && x.FechaInicio <= DateTime.Now && x.FechaHasta >= DateTime.Now);
             miResenaId = (await _context.Resenas.AsNoTracking().FirstOrDefaultAsync(x => x.IdLibro == id && x.IdLector == usuarioId))?.Id;
         }
 
         return View(new LibroDetalleViewModel
         {
             Libro = libro, ContenidoBloqueado = bloqueado, MotivoBloqueo = motivo,
-            PuedeComprar = User.IsInRole(RolesAplicacion.Lector) && !bloqueado && !compraVigente,
-            PuedeAlquilar = User.IsInRole(RolesAplicacion.Lector) && !bloqueado && !alquilerVigente && !compraVigente,
+            PuedeComprar = User.Identity?.IsAuthenticated == true && !esLibroPropio && !bloqueado && !compraVigente,
+            PuedeAlquilar = User.Identity?.IsAuthenticated == true && !esLibroPropio && !bloqueado && !alquilerVigente && !compraVigente,
             PuedeResenar = puedeResenar, YaCompro = yaCompro, AlquilerVigente = alquilerVigente,
             CompraVigente = compraVigente, MiResenaId = miResenaId, PaginaResenas = paginaResenas,
             TotalPaginasResenas = totalPaginasResenas, TotalResenas = totalResenas, PromedioResenas = promedioResenas
@@ -319,13 +321,18 @@ public class LibrosController : Controller
         }
     }
 
-    [Authorize(Roles = RolesAplicacion.Lector)]
+    [Authorize]
     [HttpPost]
     public async Task<IActionResult> Comprar(int id)
     {
         var usuarioId = ObtenerIdUsuario();
         var libro = await _context.Libros.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
         if (libro is null) return NotFound();
+        if(libro.IdEscritor == usuarioId)
+        {
+            TempData["Error"] = "No puedes comprar tu propio libro.";
+            return RedirectToAction(nameof(Detalle), new { id });
+        }
         if (await EdadInsuficienteAsync(usuarioId, libro))
         {
             TempData["Error"] = "Este libro es +18 y tu cuenta no cumple la edad mínima.";
@@ -342,7 +349,7 @@ public class LibrosController : Controller
         return RedirectToAction("Compras", "Biblioteca");
     }
 
-    [Authorize(Roles = RolesAplicacion.Lector)]
+    [Authorize]
     [HttpPost]
     public async Task<IActionResult> Alquilar(int id, int dias = 7)
     {
@@ -350,6 +357,11 @@ public class LibrosController : Controller
         if (dias is not (7 or 15 or 30)) dias = 7;
         var libro = await _context.Libros.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
         if (libro is null) return NotFound();
+        if(libro.IdEscritor == usuarioId)
+        {
+            TempData["Error"] = "No puedes alquilar tu propio libro.";
+            return RedirectToAction(nameof(Detalle), new { id });
+        }
         if (await EdadInsuficienteAsync(usuarioId, libro))
         {
             TempData["Error"] = "Este libro es +18 y tu cuenta no cumple la edad mínima.";
@@ -375,7 +387,7 @@ public class LibrosController : Controller
         return RedirectToAction("Alquileres", "Biblioteca");
     }
 
-    [Authorize(Roles = RolesAplicacion.Lector)]
+    [Authorize]
     [HttpPost]
     public async Task<IActionResult> DevolverCompra(int id)
     {
@@ -393,7 +405,7 @@ public class LibrosController : Controller
         return RedirectToAction("Compras", "Biblioteca");
     }
 
-    [Authorize(Roles = RolesAplicacion.Lector)]
+    [Authorize]
     [HttpGet]
     public async Task<IActionResult> Descargar(int id)
     {
@@ -414,7 +426,7 @@ public class LibrosController : Controller
         return PhysicalFile(ruta, mime, $"{NombreArchivoSeguro(libro.Titulo)}{Path.GetExtension(ruta)}");
     }
 
-    [Authorize(Roles = RolesAplicacion.Lector)]
+    [Authorize]
     [HttpGet]
     public async Task<IActionResult> Leer(int id)
     {

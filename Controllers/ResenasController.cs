@@ -15,7 +15,7 @@ public class ResenasController : Controller
     private readonly EntrePaginasContext _context;
     public ResenasController(EntrePaginasContext context) => _context = context;
 
-    [Authorize(Roles = RolesAplicacion.Lector)]
+    [Authorize]
     [HttpPost]
     public async Task<IActionResult> Crear(ReviewFormViewModel model)
     {

@@ -19,7 +19,7 @@
             <div class="nav-links">
                 <a asp-controller="Home" asp-action="Index">Inicio</a>
                 <a asp-controller="Libros" asp-action="Index">Catálogo</a>
-                @if (User.Identity?.IsAuthenticated == true && User.IsInRole("Lector"))
+                @if (User.Identity?.IsAuthenticated == true)
                 {
                     <a asp-controller="Biblioteca" asp-action="Compras">Mi biblioteca</a>
                 }
@@ -72,7 +72,7 @@
         @RenderBody()
     </main>
     <footer class="site-footer">
-        <div class="footer-inner"><span>Entre Páginas</span><span>Donde cada historia encuentra a su lector</span><a asp-controller="Home" asp-action="Privacy">Privacidad</a></div>
+        <div class="footer-inner"><span>Entre Páginas</span><span>Donde cada historia encuentra a su lector</span><span>Autoras: Milena Miselli y Lourdes Villegas</span></div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>

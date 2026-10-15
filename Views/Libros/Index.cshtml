@@ -52,7 +52,7 @@
                         <a asp-action="Detalle" asp-route-id="@libro.Id" class="library-book-cover"><img src="@portada" alt="Portada de @libro.Titulo" loading="lazy" /></a>
                         <div class="library-book-content">
                             <span class="library-category">@libro.Categoria.Nombre</span>
-                            <h2><a asp-action="Detalle" asp-route-id="@libro.Id">@libro.Titulo</a></h2>
+                            <h2><a style="color: black;" asp-action="Detalle" asp-route-id="@libro.Id">@libro.Titulo</a></h2>
                             <p class="library-author">por @(string.IsNullOrWhiteSpace(libro.Autor) ? $"{libro.Escritor.Nombre} {libro.Escritor.Apellido}" : libro.Autor)</p>
                             <p class="library-description">@(string.IsNullOrWhiteSpace(libro.Descripcion) ? "Una historia para descubrir." : libro.Descripcion)</p>
                             <div class="library-rating"><span class="stars">@(promedio == 0 ? "☆☆☆☆☆" : new string('★', (int)Math.Round(promedio)))</span><span>@(cantidadResenas == 0 ? "Sin reseñas" : promedio.ToString("0.0"))</span></div>

@@ -765,7 +765,7 @@ html {
 .library-page {
     min-height: 100vh;
 
-    padding: 45px 30px 80px;
+    padding: 110px 30px 80px;
 
     font-family: Georgia, "Times New Roman", serif;
 
@@ -1456,7 +1456,7 @@ html {
 .role-pill, .status-pill { display: inline-block; padding: 4px 9px; border-radius: 30px; background: #eee0ce; color: #68472b; font-size: 12px; font-weight: 700; }
 
 /* Páginas de administración, edición y biblioteca personal */
-.management-page { min-height: calc(100vh - 100px); padding: 44px 24px 75px; color: #392316; font-family: Georgia, "Times New Roman", serif; background: linear-gradient(160deg,#ead9bf,#f8f0e5 45%,#e5c8a1); }
+.management-page { min-height: calc(100vh - 100px); padding: 110px 24px 75px; color: #392316; font-family: Georgia, "Times New Roman", serif; background: linear-gradient(160deg,#ead9bf,#f8f0e5 45%,#e5c8a1); }
 .management-container { width: min(1180px,100%); margin: 0 auto; }
 .management-header { margin: 14px 0 26px; }
 .management-header h1 { margin: 3px 0 9px; color: #35190d; font-size: clamp(30px,4vw,44px); }
@@ -1611,4 +1611,156 @@ html {
     .openlibrary-search { flex-direction: column; }
     .category-editor-row { flex-direction: column; }
     .admin-search-form { flex-direction: column; }
+}
+
+/* Puntuacion Con estrellas */
+.review-rating-field {
+    margin-bottom: 20px;
+}
+
+.rating-title {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #35190d;
+}
+
+.star-rating {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+    width: fit-content;
+    gap: 4px;
+}
+
+.star-rating input {
+    position: absolute;
+    opacity: 0;
+    width: 1px;
+    height: 1px;
+}
+
+.star-rating label {
+    font-size: 2.2rem;
+    color: #c9bba8;
+    cursor: pointer;
+    line-height: 1;
+    transition: color 0.15s ease, transform 0.15s ease;
+}
+
+.star-rating label:hover,
+.star-rating label:hover ~ label {
+    color: #d69b27;
+}
+
+.star-rating input:checked ~ label {
+    color: #d69b27;
+}
+
+.star-rating input:focus-visible + label {
+    outline: 2px solid #8b5e34;
+    outline-offset: 3px;
+    border-radius: 3px;
+}
+
+.star-rating label:hover {
+    transform: scale(1.12);
+}
+
+.rating-hint {
+    display: block;
+    margin-top: 8px;
+    font-size: 0.85rem;
+    color: #806c5c;
+}
+
+
+/* Crear administrador */
+.admin-users-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin: 18px 0;
+}
+
+.admin-create-card {
+    padding: 28px;
+}
+
+.admin-create-form h2 {
+    margin: 8px 0 20px;
+    color: #35190d;
+    font-family: Georgia, serif;
+    font-size: 1.25rem;
+}
+
+.admin-create-form h2:not(:first-of-type) {
+    margin-top: 32px;
+}
+
+.admin-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+}
+
+.admin-form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.admin-form-field label {
+    color: #513321;
+    font-weight: 600;
+}
+
+.admin-form-field .form-control {
+    min-height: 44px;
+    border: 1px solid #d8c5ad;
+    border-radius: 8px;
+    background: #fffdf9;
+}
+
+.admin-form-field .form-control:focus {
+    border-color: #98704a;
+    box-shadow: 0 0 0 3px rgb(152 112 74 / 15%);
+}
+
+.admin-form-full {
+    grid-column: 1 / -1;
+}
+
+.admin-role-notice {
+    margin-top: 28px;
+    padding: 16px 18px;
+    border: 1px solid #e1d0b9;
+    border-radius: 10px;
+    background: #f7efe3;
+    color: #513321;
+}
+
+.admin-role-notice p {
+    margin: 6px 0 0;
+}
+
+.admin-form-actions {
+    display: flex;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 28px;
+}
+
+@media (max-width: 640px) {
+    .admin-create-card {
+        padding: 18px;
+    }
+
+    .admin-form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-form-full {
+        grid-column: auto;
+    }
 }
