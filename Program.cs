@@ -28,6 +28,7 @@ builder.Services.AddDbContext<EntrePaginasContext>(options =>
 
 builder.Services.AddScoped<UploadStorageService>();
 builder.Services.AddMemoryCache();
+builder.Services.AddHttpClient<DiccionarioApiService>();
 builder.Services.AddHttpClient<OpenLibraryService>(client =>
 {
     client.BaseAddress = new Uri("https://openlibrary.org/");

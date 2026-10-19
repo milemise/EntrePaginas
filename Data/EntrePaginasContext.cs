@@ -15,7 +15,8 @@ public class EntrePaginasContext : DbContext
     public DbSet<Compra> Compras => Set<Compra>();
     public DbSet<Alquiler> Alquileres => Set<Alquiler>();
     public DbSet<Resena> Resenas => Set<Resena>();
-
+    public DbSet<PalabraFavorita> PalabrasFavoritas => Set<PalabraFavorita>();
+    public DbSet<Notificacion> Notificaciones => Set<Notificacion>();
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Usuario>(entity =>
@@ -113,5 +114,39 @@ public class EntrePaginasContext : DbContext
             entity.HasOne(x => x.Libro).WithMany(x => x.Resenas).HasForeignKey(x => x.IdLibro).OnDelete(DeleteBehavior.Restrict);
             entity.HasOne(x => x.Lector).WithMany(x => x.Resenas).HasForeignKey(x => x.IdLector).OnDelete(DeleteBehavior.Restrict);
         });
+        
+        modelBuilder.Entity<PalabraFavorita>(entity =>
+        {
+            entity.ToTable("palabras_favoritas");
+
+            entity.HasKey(x => x.Id);
+
+            entity.Property(x => x.Id)
+                .HasColumnName("id");
+
+            entity.Property(x => x.IdUsuario)
+                .HasColumnName("id_usuario")
+                .IsRequired();
+
+            entity.Property(x => x.Palabra)
+                .HasColumnName("palabra")
+                .HasMaxLength(150)
+                .IsRequired();
+
+            entity.Property(x => x.FechaAgregado)
+                .HasColumnName("fecha_agregado")
+                .HasColumnType("datetime")
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+            entity.HasOne(x => x.Usuario)
+                .WithMany()
+                .HasForeignKey(x => x.IdUsuario)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasIndex(x => new { x.IdUsuario, x.Palabra })
+                .IsUnique()
+                .HasDatabaseName("uq_favorito_usuario_palabra");
+        });
+
     }
 }

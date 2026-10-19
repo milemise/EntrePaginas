@@ -1,4 +1,5 @@
-@model RegistroViewModel
+@using EntrePaginas.Models;
+@model EntrePaginas.Models.Usuario
 @{
     ViewData["Title"] = "Crear cuenta";
 }
@@ -9,17 +10,102 @@
         <h1>Crear una cuenta</h1>
         <p>Registrate para leer, comprar o compartir tus propias obras.</p>
         <form asp-action="Registro" method="post" class="account-form account-form-grid">
-            <div asp-validation-summary="ModelOnly" class="text-danger form-grid-full"></div>
-            <div><label asp-for="Nombre"></label><input asp-for="Nombre" autocomplete="given-name" /><span asp-validation-for="Nombre" class="text-danger"></span></div>
-            <div><label asp-for="Apellido"></label><input asp-for="Apellido" autocomplete="family-name" /><span asp-validation-for="Apellido" class="text-danger"></span></div>
-            <div><label asp-for="NombreUsuario"></label><input asp-for="NombreUsuario" autocomplete="username" /><span asp-validation-for="NombreUsuario" class="text-danger"></span></div>
-            <div><label asp-for="Email"></label><input asp-for="Email" autocomplete="email" /><span asp-validation-for="Email" class="text-danger"></span></div>
-            <div><label asp-for="Dni"></label><input asp-for="Dni" /><span asp-validation-for="Dni" class="text-danger"></span></div>
-            <div><label asp-for="Telefono"></label><input asp-for="Telefono" autocomplete="tel" /><span asp-validation-for="Telefono" class="text-danger"></span></div>
-            <div><label asp-for="FechaNacimiento"></label><input asp-for="FechaNacimiento" type="date" max="@DateTime.Today.ToString("yyyy-MM-dd")" /><span asp-validation-for="FechaNacimiento" class="text-danger"></span></div>
-            <div><label asp-for="TipoCuenta">Quiero registrarme como</label><select asp-for="TipoCuenta"><option value="Lector">Lector/a</option><option value="Escritor">Escritor/a</option></select><span asp-validation-for="TipoCuenta" class="text-danger"></span></div>
-            <div><label asp-for="Password"></label><input asp-for="Password" autocomplete="new-password" /><span asp-validation-for="Password" class="text-danger"></span></div>
-            <div><label asp-for="ConfirmarPassword"></label><input asp-for="ConfirmarPassword" autocomplete="new-password" /><span asp-validation-for="ConfirmarPassword" class="text-danger"></span></div>
+            <div asp-validation-summary="ModelOnly" class="text-danger form-grid-full"></div>           
+            <div>
+                <label asp-for="Nombre"></label>
+                <input asp-for="Nombre"
+                    autocomplete="given-name"
+                    maxlength="100"
+                    placeholder="Tu nombre" />
+                <span asp-validation-for="Nombre" class="text-danger"></span>
+            </div>
+
+            <div>
+                <label asp-for="Apellido"></label>
+                <input asp-for="Apellido"
+                    autocomplete="family-name"
+                    maxlength="100"
+                    placeholder="Tu apellido" />
+                <span asp-validation-for="Apellido" class="text-danger"></span>
+            </div>
+
+            <div>
+                <label asp-for="NombreUsuario"></label>
+                <input asp-for="NombreUsuario"
+                    autocomplete="username"
+                    minlength="4"
+                    maxlength="50"
+                    placeholder="Ej.: lectora123" />
+                <span asp-validation-for="NombreUsuario" class="text-danger"></span>
+            </div>
+
+            <div>
+                <label asp-for="Email"></label>
+                <input asp-for="Email"
+                    type="email"
+                    autocomplete="email"
+                    maxlength="150"
+                    placeholder="tuemail@ejemplo.com" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+
+            <div>
+                <label asp-for="Dni"></label>
+                <input asp-for="Dni"
+                    type="text"
+                    inputmode="numeric"
+                    maxlength="8"
+                    pattern="[0-9]{7,8}"
+                    placeholder="Sin puntos" />
+                <span asp-validation-for="Dni" class="text-danger"></span>
+            </div>
+
+            <div>
+                <label asp-for="Telefono"></label>
+                <input asp-for="Telefono"
+                    type="tel"
+                    inputmode="numeric"
+                    maxlength="13"
+                    autocomplete="tel"
+                    placeholder="Solo números, sin espacios" />
+                <span asp-validation-for="Telefono" class="text-danger"></span>
+            </div>
+
+            <div>
+                <label asp-for="FechaNacimiento"></label>
+                <input asp-for="FechaNacimiento"
+                    type="date"
+                    max="@DateTime.Today.ToString("yyyy-MM-dd")" />
+                <span asp-validation-for="FechaNacimiento" class="text-danger"></span>
+            </div>
+
+            <div>
+                <label asp-for="Rol">Quiero registrarme como</label>
+                <select asp-for="Rol">
+                    <option value="Lector">Lector/a</option>
+                    <option value="Escritor">Escritor/a</option>
+                </select>
+                <span asp-validation-for="Rol" class="text-danger"></span>
+            </div>
+
+            <div>
+                <label asp-for="Password"></label>
+                <input asp-for="Password"
+                    type="password"
+                    autocomplete="new-password"
+                    minlength="8"
+                    maxlength="255" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+
+            <div>
+                <label asp-for="ConfirmarPassword"></label>
+                <input asp-for="ConfirmarPassword"
+                    type="password"
+                    autocomplete="new-password" />
+                <span asp-validation-for="ConfirmarPassword" class="text-danger"></span>
+            </div>
+
             <div class="form-grid-full"><button type="submit" class="detail-primary-button">Crear mi cuenta</button></div>
         </form>
         <p class="account-switch">¿Ya tenés cuenta? <a asp-action="Login">Iniciá sesión</a></p>

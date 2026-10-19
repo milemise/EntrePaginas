@@ -1,0 +1,176 @@
+
+@model EntrePaginas.ViewModels.DiccionarioViewModel
+
+@{
+    ViewData["Title"] = "Diccionario";
+}
+
+<link rel="stylesheet" href="~/css/diccionario.css" asp-append-version="true" />
+
+<main class="diccionario-page">
+    <section class="diccionario-hero">
+        <span class="diccionario-eyebrow">EL ARTE DE LAS PALABRAS</span>
+        <h1>Diccionario de Entre Páginas</h1>
+        <p>
+            Cada palabra guarda una historia.
+            Encontrá su significado y descubrí nuevas formas de expresarte.
+        </p>
+
+        <form asp-controller="Diccionario"
+              asp-action="Index"
+              method="get"
+              class="diccionario-search">
+            <label for="busqueda" class="visually-hidden">
+                Buscar una palabra
+            </label>
+            <input id="busqueda"
+                   name="busqueda"
+                   value="@Model.Busqueda"
+                   maxlength="150"
+                   placeholder="¿Qué palabra querés descubrir?"
+                   autocomplete="off"
+                   required />
+            <button type="submit">Buscar</button>
+        </form>
+        
+        <div class="diccionario-quick-links">
+            @if (User.Identity?.IsAuthenticated == true &&
+                Model.PalabrasFavoritas.Any())
+            {
+                @foreach (var palabra in Model.PalabrasFavoritas)
+                {
+                    <a asp-controller="Diccionario"
+                    asp-action="Index"
+                    asp-route-busqueda="@palabra">
+                        @palabra
+                    </a>
+                }
+            }
+            else
+            {
+                <a asp-controller="Diccionario"
+                asp-action="Index"
+                asp-route-busqueda="serendipia">
+                    Serendipia
+                </a>
+
+                <a asp-controller="Diccionario"
+                asp-action="Index"
+                asp-route-busqueda="nostalgia">
+                    Nostalgia
+                </a>
+
+                <a asp-controller="Diccionario"
+                asp-action="Index"
+                asp-route-busqueda="efímero">
+                    Efímero
+                </a>
+            }
+        </div>
+
+    </section>
+
+    @if (TempData["MensajeDiccionario"] is string mensaje)
+    {
+        <div class="diccionario-notice" role="status">
+            @mensaje
+        </div>
+    }
+    
+    @if (Model.Resultado != null)
+    {
+        <section class="resultado-diccionario">
+            <div class="definicion-heading">
+                <h2>@Model.Resultado.Palabra</h2>
+
+                @if (User.Identity?.IsAuthenticated == true)
+                {
+                    <form asp-controller="Diccionario"
+                        asp-action="AgregarFavorito"
+                        method="post">
+                        @Html.AntiForgeryToken()
+
+                        <input type="hidden"
+                            name="palabra"
+                            value="@Model.Resultado.Palabra" />
+
+                        <button type="submit" class="btn-favorito">
+                            ♡ Agregar a favoritos
+                        </button>
+                    </form>
+                }
+                else
+                {
+                    <a asp-controller="Cuenta"
+                    asp-action="Login"
+                    class="btn-favorito">
+                        ♡ Iniciá sesión para guardar
+                    </a>
+                }
+            </div>
+
+            <div class="definicion-palabra">
+                <h3>Significado</h3>
+
+                @if (Model.Resultado.Definiciones.Any())
+                {
+                    <p>@Model.Resultado.Definiciones.First()</p>
+                }
+                else if (!string.IsNullOrWhiteSpace(Model.Resultado.Contenido))
+                {
+                    <p>@Model.Resultado.Contenido</p>
+                }
+                else
+                {
+                    <p>No se encontró una definición breve para esta palabra.</p>
+                }
+            </div>
+
+            @if (Model.Resultado.Ejemplos.Any())
+            {
+                <div class="ejemplo-palabra">
+                    <h3>Ejemplo</h3>
+                    <p>
+                        <em>“@Model.Resultado.Ejemplos.First()”</em>
+                    </p>
+                </div>
+            }
+
+            @if (!string.IsNullOrWhiteSpace(Model.Resultado.UrlFuente))
+            {
+                <a href="@Model.Resultado.UrlFuente"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="enlace-fuente">
+                    Ver más información sobre esta palabra
+                    <span aria-hidden="true">↗</span>
+                </a>
+            }
+        </section>
+    }
+
+    else if (!string.IsNullOrWhiteSpace(Model.Mensaje))
+    {
+        <section class="diccionario-mensaje" role="status">
+            <span class="mensaje-icono" aria-hidden="true">✧</span>
+            <h2>No encontramos esa palabra</h2>
+            <p>@Model.Mensaje</p>
+        </section>
+    }
+
+    <section class="favoritos-banner">
+        <div>
+            <span class="diccionario-eyebrow">TU COLECCIÓN PERSONAL</span>
+            <h2>Guardá las palabras que te inspiran</h2>
+            <p>
+                Creá tu propia colección de palabras para volver a ellas
+                cuando quieras.
+            </p>
+        </div>
+        <a asp-controller="Diccionario"
+           asp-action="Favoritos"
+           class="btn-favoritos">
+            Mis favoritos
+        </a>
+    </section>
+</main>

@@ -32,6 +32,8 @@
                 {
                     <a asp-controller="Admin" asp-action="Index">Administración</a>
                 }
+                <a asp-controller="Diccionario" asp-action="Index">Diccionario</a>
+                <a asp-controller="Notificaciones" asp-action="Index">Notificaciones</a>
             </div>
             <div class="nav-actions">
                 @if (User.Identity?.IsAuthenticated == true)

@@ -1,0 +1,82 @@
+
+@model IEnumerable<EntrePaginas.Models.PalabraFavorita>
+
+@{
+    ViewData["Title"] = "Mis palabras favoritas";
+}
+
+<link rel="stylesheet" href="~/css/diccionario.css" asp-append-version="true" />
+
+<main class="diccionario-page favoritos-page">
+    <section class="favoritos-encabezado">
+        <span class="diccionario-eyebrow">TU BIBLIOTECA DE PALABRAS</span>
+        <h1>Mis palabras favoritas</h1>
+        <p>
+            Un rincón para conservar esas palabras que querés recordar.
+        </p>
+
+        <a asp-controller="Diccionario" asp-action="Index"
+           class="volver-diccionario">
+            ← Volver al diccionario
+        </a>
+    </section>
+
+    @if (TempData["MensajeDiccionario"] is string mensaje)
+    {
+        <div class="diccionario-notice" role="status">
+            @mensaje
+        </div>
+    }
+
+    @if (Model.Any())
+    {
+        <div class="favoritos-lista">
+            @foreach (var favorito in Model)
+            {
+                <article class="favorito-item">
+                    <div class="favorito-info">
+                        <span class="termino-simbolo" aria-hidden="true">✧</span>
+                        <div>
+                            <h2>@favorito.Palabra</h2>
+                            <time datetime="@favorito.FechaAgregado.ToString("yyyy-MM-ddTHH:mm:ss")">
+                                Guardada el @favorito.FechaAgregado.ToString("dd/MM/yyyy")
+                            </time>
+                        </div>
+                    </div>
+
+                    <div class="favorito-acciones">
+                        <a asp-controller="Diccionario"
+                           asp-action="Index"
+                           asp-route-busqueda="@favorito.Palabra">
+                            Ver definición
+                        </a>
+
+                        <form asp-controller="Diccionario"
+                              asp-action="QuitarFavorito"
+                              method="post">
+                            <input type="hidden" name="id" value="@favorito.Id" />
+                            <button type="submit" class="btn-quitar">
+                                Quitar
+                            </button>
+                        </form>
+                    </div>
+                </article>
+            }
+        </div>
+    }
+    else
+    {
+        <section class="favoritos-vacios">
+            <span aria-hidden="true">♡</span>
+            <h2>Todavía no guardaste palabras</h2>
+            <p>
+                Explorá el diccionario y guardá las palabras que quieras
+                conservar en tu colección.
+            </p>
+            <a asp-controller="Diccionario" asp-action="Index"
+               class="btn-favoritos">
+                Explorar el diccionario
+            </a>
+        </section>
+    }
+</main>

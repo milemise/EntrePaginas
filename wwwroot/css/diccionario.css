@@ -1,0 +1,532 @@
+
+body {
+    padding: 100px 0;
+    background-image: url('/images/fondo1.png');
+    background-size: cover;
+    background-position: center top;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
+
+.diccionario-page {
+    position: relative;
+    z-index: 1;
+}
+
+.definicion-card,
+.diccionario-mensaje,
+.termino-card,
+.favorito-item,
+.favoritos-vacios {
+    background-color: rgba(255, 253, 248, 0.94);
+}
+
+.diccionario-page {
+    --dic-tinta: #39271e;
+    --dic-marron: #68452f;
+    --dic-dorado: #a77b42;
+    --dic-pergamino: #fbf5e9;
+    --dic-borde: #e6d6bd;
+    width: min(1120px, calc(100% - 32px));
+    margin: 40px auto 72px;
+    color: var(--dic-tinta);
+}
+
+.diccionario-hero {
+    padding: clamp(30px, 6vw, 68px) 24px;
+    text-align: center;
+    border: 1px solid var(--dic-borde);
+    border-radius: 24px;
+    background:
+        radial-gradient(ellipse at top, rgba(255,255,255,.75), transparent 65%),
+        var(--dic-pergamino);
+    box-shadow: 0 12px 32px rgba(57, 39, 30, .08);
+}
+
+.diccionario-eyebrow {
+    display: block;
+    margin-bottom: 12px;
+    color: var(--dic-dorado);
+    font-size: .75rem;
+    font-weight: 800;
+    letter-spacing: .18em;
+}
+
+.diccionario-hero h1,
+.favoritos-encabezado h1 {
+    margin: 0;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: clamp(2rem, 5vw, 3.4rem);
+    line-height: 1.15;
+}
+
+.diccionario-hero > p,
+.favoritos-encabezado > p {
+    max-width: 650px;
+    margin: 18px auto 28px;
+    color: #756354;
+    line-height: 1.8;
+}
+
+.diccionario-search {
+    display: flex;
+    width: min(680px, 100%);
+    gap: 10px;
+    margin: 0 auto;
+    padding: 8px;
+    border: 1px solid #dfcdb0;
+    border-radius: 15px;
+    background: #fffdf8;
+    box-shadow: 0 6px 18px rgba(57, 39, 30, .06);
+}
+
+.diccionario-search input {
+    min-width: 0;
+    flex: 1;
+    padding: 13px 15px;
+    border: 0;
+    outline: none;
+    background: transparent;
+    color: var(--dic-tinta);
+    font-size: 1rem;
+}
+
+.diccionario-search input:focus-visible {
+    outline: 2px solid var(--dic-dorado);
+    outline-offset: -2px;
+    border-radius: 8px;
+}
+
+.diccionario-search button,
+.btn-favoritos {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 13px 22px;
+    border: 1px solid var(--dic-marron);
+    border-radius: 10px;
+    background: var(--dic-marron);
+    color: #fffaf0;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background .2s, transform .2s;
+}
+
+.diccionario-search button:hover,
+.btn-favoritos:hover {
+    background: #4e3223;
+    color: #fffaf0;
+    transform: translateY(-1px);
+}
+
+.diccionario-quick-links {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 22px;
+}
+
+.diccionario-quick-links a {
+    padding: 7px 13px;
+    border: 1px solid var(--dic-borde);
+    border-radius: 999px;
+    color: var(--dic-marron);
+    font-size: .9rem;
+    text-decoration: none;
+}
+
+.diccionario-quick-links a:hover {
+    background: #efe2cd;
+}
+
+.definicion-card,
+.diccionario-mensaje {
+    margin-top: 30px;
+    padding: clamp(22px, 4vw, 42px);
+    border: 1px solid var(--dic-borde);
+    border-radius: 20px;
+    background: #fffdf8;
+    box-shadow: 0 8px 25px rgba(57, 39, 30, .05);
+}
+
+.definicion-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+    padding-bottom: 22px;
+    border-bottom: 1px solid var(--dic-borde);
+    margin-bottom: 25px;
+}
+
+.definicion-heading h2 {
+    margin: 0;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: clamp(2rem, 4vw, 3rem);
+    overflow-wrap: anywhere;
+}
+
+.btn-favorito {
+    padding: 10px 14px;
+    border: 1px solid var(--dic-borde);
+    border-radius: 10px;
+    background: #f7eddd;
+    color: var(--dic-marron);
+    font-size: .9rem;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.btn-favorito:hover {
+    background: #efe0c6;
+    color: var(--dic-tinta);
+}
+
+.definicion-card h3 {
+    margin: 26px 0 14px;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 1.3rem;
+}
+
+.definicion-list,
+.ejemplos-list {
+    padding-left: 25px;
+    line-height: 1.85;
+}
+
+.definicion-list li,
+.ejemplos-list li {
+    padding: 4px 0 8px 5px;
+}
+
+.ejemplos-list li {
+    color: #725a47;
+    font-style: italic;
+}
+
+.contenido-completo {
+    margin-top: 25px;
+    padding: 15px 18px;
+    border: 1px solid var(--dic-borde);
+    border-radius: 12px;
+    background: #fbf5e9;
+}
+
+.contenido-completo summary {
+    color: var(--dic-marron);
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.contenido-completo p {
+    margin-top: 15px;
+    line-height: 1.8;
+    white-space: pre-line;
+    overflow-wrap: anywhere;
+}
+
+.fuente-link,
+.volver-diccionario {
+    display: inline-block;
+    margin-top: 20px;
+    color: var(--dic-marron);
+    font-weight: 700;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+}
+
+.diccionario-mensaje {
+    text-align: center;
+}
+
+.mensaje-icono {
+    color: var(--dic-dorado);
+    font-size: 2.2rem;
+}
+
+.diccionario-mensaje h2 {
+    font-family: Georgia, "Times New Roman", serif;
+}
+
+.diccionario-mensaje p {
+    color: #756354;
+    line-height: 1.7;
+}
+
+.rincon-literario {
+    margin-top: 58px;
+}
+
+.seccion-titulo {
+    margin-bottom: 24px;
+}
+
+.seccion-titulo h2,
+.favoritos-banner h2 {
+    margin: 0 0 10px;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: clamp(1.7rem, 3vw, 2.4rem);
+}
+
+.seccion-titulo p,
+.favoritos-banner p {
+    color: #756354;
+    line-height: 1.7;
+}
+
+.terminos-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.termino-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 90px;
+    padding: 18px;
+    border: 1px solid var(--dic-borde);
+    border-radius: 14px;
+    background: #fffdf8;
+    color: var(--dic-tinta);
+    font-family: Georgia, "Times New Roman", serif;
+    text-decoration: none;
+    transition: transform .2s, box-shadow .2s, background .2s;
+}
+
+.termino-card:hover {
+    transform: translateY(-3px);
+    background: var(--dic-pergamino);
+    box-shadow: 0 8px 18px rgba(57, 39, 30, .08);
+    color: var(--dic-marron);
+}
+
+.termino-simbolo {
+    flex-shrink: 0;
+    color: var(--dic-dorado);
+    font-size: 1.25rem;
+}
+
+.termino-flecha {
+    margin-left: auto;
+    color: var(--dic-dorado);
+}
+
+.favoritos-banner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+    margin-top: 58px;
+    padding: clamp(24px, 4vw, 40px);
+    border: 1px solid var(--dic-borde);
+    border-radius: 20px;
+    background: var(--dic-pergamino);
+}
+
+.favoritos-banner > div {
+    flex: 1;
+    min-width: 220px;
+}
+
+.favoritos-banner p {
+    margin-bottom: 0;
+}
+
+.favoritos-encabezado {
+    padding: 35px 0;
+    text-align: center;
+}
+
+.favoritos-lista {
+    display: grid;
+    gap: 12px;
+}
+
+.favorito-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+    padding: 20px 24px;
+    border: 1px solid var(--dic-borde);
+    border-radius: 15px;
+    background: #fffdf8;
+}
+
+.favorito-info,
+.favorito-acciones {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.favorito-info h2 {
+    margin: 0 0 5px;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 1.35rem;
+    overflow-wrap: anywhere;
+}
+
+.favorito-info time {
+    color: #887766;
+    font-size: .85rem;
+}
+
+.favorito-acciones a {
+    color: var(--dic-marron);
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.favorito-acciones a:hover {
+    text-decoration: underline;
+}
+
+.btn-quitar {
+    padding: 8px 12px;
+    border: 1px solid #d7b9a9;
+    border-radius: 8px;
+    background: #fff8f4;
+    color: #884332;
+    cursor: pointer;
+}
+
+.btn-quitar:hover {
+    background: #f5e3d9;
+}
+
+.favoritos-vacios {
+    padding: 50px 20px;
+    border: 1px dashed var(--dic-borde);
+    border-radius: 18px;
+    background: #fffdf8;
+    text-align: center;
+}
+
+.favoritos-vacios > span {
+    color: var(--dic-dorado);
+    font-size: 3rem;
+}
+
+.favoritos-vacios h2 {
+    font-family: Georgia, "Times New Roman", serif;
+}
+
+.favoritos-vacios p {
+    max-width: 500px;
+    margin: 0 auto 22px;
+    color: #756354;
+    line-height: 1.7;
+}
+
+.diccionario-notice {
+    margin-top: 18px;
+    padding: 14px 18px;
+    border: 1px solid var(--dic-borde);
+    border-radius: 10px;
+    background: #f7eddd;
+    color: var(--dic-tinta);
+}
+
+@media (max-width: 800px) {
+    .terminos-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .favorito-acciones {
+        width: 100%;
+        justify-content: space-between;
+    }
+}
+
+@media (max-width: 520px) {
+    .diccionario-page {
+        width: calc(100% - 20px);
+        margin-top: 20px;
+    }
+
+    .diccionario-search {
+        flex-direction: column;
+    }
+
+    .diccionario-search button {
+        width: 100%;
+    }
+
+    .terminos-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .termino-card {
+        min-height: 68px;
+    }
+
+    .favorito-item {
+        padding: 17px;
+    }
+}
+
+.resultado-diccionario {
+    margin-top: 2rem;
+    padding: 1.8rem;
+    background: rgba(255, 250, 239, 0.96);
+    border: 1px solid #d7c19b;
+    border-radius: 14px;
+    color: #493522;
+    box-shadow: 0 5px 18px rgba(65, 42, 20, 0.10);
+}
+
+.resultado-diccionario h2 {
+    margin-bottom: 1.5rem;
+    color: #704b2c;
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+.definicion-palabra,
+.ejemplo-palabra {
+    margin-bottom: 1.3rem;
+}
+
+.definicion-palabra h3,
+.ejemplo-palabra h3 {
+    margin-bottom: 0.5rem;
+    color: #8a623d;
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+.definicion-palabra p,
+.ejemplo-palabra p {
+    margin-bottom: 0;
+    line-height: 1.8;
+    font-size: 1rem;
+}
+
+.ejemplo-palabra {
+    padding: 1rem;
+    background: #f3ead9;
+    border-left: 4px solid #a78050;
+    border-radius: 5px;
+}
+
+.enlace-fuente {
+    display: inline-block;
+    margin-top: 0.5rem;
+    color: #80552e;
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+.enlace-fuente:hover {
+    color: #4f321b;
+}

@@ -1427,7 +1427,7 @@ html {
 .compact-empty { padding: 28px 16px; box-shadow: none; }
 
 /* Formularios de cuenta */
-.account-page { min-height: calc(100vh - 105px); padding: 54px 18px 70px; display: flex; justify-content: center; align-items: flex-start; background: linear-gradient(135deg,#ead8bf,#f8f0e3 55%,#e0c29a); font-family: Georgia, "Times New Roman", serif; }
+.account-page { min-height: calc(100vh - 105px); padding: 110px 18px 70px; display: flex; justify-content: center; align-items: flex-start; background: linear-gradient(135deg,#ead8bf,#f8f0e3 55%,#e0c29a); font-family: Georgia, "Times New Roman", serif; }
 .account-card { width: min(460px,100%); padding: 34px; border: 1px solid #c9a97c; border-radius: 17px; background: rgba(255,250,241,.97); box-shadow: 0 12px 38px #3b241424; }
 .account-card-wide { width: min(760px,100%); }
 .account-emblem { text-align: center; margin-bottom: 14px; }

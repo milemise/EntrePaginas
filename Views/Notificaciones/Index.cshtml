@@ -1,0 +1,265 @@
+
+@model IEnumerable<EntrePaginas.Models.Notificacion>
+
+@{
+    ViewData["Title"] = "Mis notificaciones";
+
+    var notificaciones = Model?.ToList()
+        ?? new List<EntrePaginas.Models.Notificacion>();
+
+    var cantidadNoLeidas = notificaciones.Count(n => !n.Leida);
+}
+
+<link rel="stylesheet"
+      href="~/css/notificaciones.css"
+      asp-append-version="true" />
+
+<main class="notificaciones-page">
+    <section class="notificaciones-hero">
+        <span class="notificaciones-eyebrow">
+            EL CORREO DE ENTRE PÁGINAS
+        </span>
+
+        <h1>Tu rincón de novedades</h1>
+
+        <p>
+            Cada mensaje trae una historia.
+            Acá encontrarás las novedades de tu mundo literario.
+        </p>
+
+        <div class="notificaciones-resumen">
+            <span>
+                <strong>@notificaciones.Count</strong>
+                @(notificaciones.Count == 1
+                    ? "notificación"
+                    : "notificaciones")
+            </span>
+
+            <span class="resumen-separador">·</span>
+
+            <span>
+                <strong>@cantidadNoLeidas</strong>
+                sin leer
+            </span>
+        </div>
+    </section>
+
+    @if (TempData["MensajeNotificacion"] is string mensaje)
+    {
+        <div class="notificaciones-alerta" role="status">
+            @mensaje
+        </div>
+    }
+
+    <section class="notificaciones-contenido">
+        <div class="notificaciones-titulo">
+            <div>
+                <span class="notificaciones-eyebrow">
+                    TU BANDEJA PERSONAL
+                </span>
+                <h2>Notificaciones</h2>
+            </div>
+
+            @if (cantidadNoLeidas > 0)
+            {
+                <form asp-controller="Notificaciones"
+                      asp-action="MarcarTodasComoLeidas"
+                      method="post">
+                    @Html.AntiForgeryToken()
+
+                    <button type="submit"
+                            class="btn-notificacion-secundario">
+                        ✓ Marcar todas como leídas
+                    </button>
+                </form>
+            }
+        </div>
+
+        @if (!notificaciones.Any())
+        {
+            <div class="notificaciones-vacias">
+                <span class="notificaciones-vacias-icono">✉</span>
+                <h3>Tu bandeja está tranquila</h3>
+                <p>
+                    Por ahora no tenés notificaciones.
+                    Cuando haya novedades, las encontrarás acá.
+                </p>
+
+                <a asp-controller="Home"
+                   asp-action="Index"
+                   class="btn-notificacion-principal">
+                    Volver a explorar
+                </a>
+            </div>
+        }
+        else
+        {
+            <div class="notificaciones-lista">
+                @foreach (var notificacion in notificaciones)
+                {
+                    var esDonacion =
+                        string.Equals(
+                            notificacion.Tipo,
+                            "Donacion",
+                            StringComparison.OrdinalIgnoreCase);
+
+                    <article class="notificacion-card
+                                    @(notificacion.Leida ? "leida" : "no-leida")
+                                    @(notificacion.Favorita ? "es-favorita" : "")
+                                    @(esDonacion ? "notificacion-donacion" : "")">
+
+                        <div class="notificacion-icono">
+                            @if (esDonacion)
+                            {
+                                <span aria-hidden="true">✧</span>
+                            }
+                            else if (notificacion.Tipo == "Reporte")
+                            {
+                                <span aria-hidden="true">⚑</span>
+                            }
+                            else if (notificacion.Tipo == "Comentario")
+                            {
+                                <span aria-hidden="true">✎</span>
+                            }
+                            else
+                            {
+                                <span aria-hidden="true">✉</span>
+                            }
+                        </div>
+
+                        <div class="notificacion-cuerpo">
+                            <div class="notificacion-encabezado">
+                                <h3>@notificacion.Titulo</h3>
+
+                                @if (!notificacion.Leida)
+                                {
+                                    <span class="notificacion-nueva">
+                                        Nueva
+                                    </span>
+                                }
+
+                                @if (notificacion.Favorita)
+                                {
+                                    <span class="notificacion-favorita">
+                                        ★ Favorita
+                                    </span>
+                                }
+                            </div>
+
+                            <p class="notificacion-mensaje">
+                                @notificacion.Mensaje
+                            </p>
+
+                            <time class="notificacion-fecha"
+                                  datetime="@notificacion.FechaCreacion.ToString("yyyy-MM-ddTHH:mm:ss")">
+                                @notificacion.FechaCreacion.ToString("dd/MM/yyyy HH:mm")
+                            </time>
+
+                            <div class="notificacion-acciones">
+                                @if (!string.IsNullOrWhiteSpace(notificacion.UrlDestino))
+                                {
+                                    <form asp-controller="Notificaciones"
+                                          asp-action="Abrir"
+                                          method="post">
+                                        @Html.AntiForgeryToken()
+
+                                        <input type="hidden"
+                                               name="id"
+                                               value="@notificacion.Id" />
+
+                                        <button type="submit"
+                                                class="btn-notificacion-abrir">
+                                            @(esDonacion
+                                                ? "✧ Abrir para ver"
+                                                : "Ver notificación →")
+                                        </button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <form asp-controller="Notificaciones"
+                                          asp-action="MarcarComoLeida"
+                                          method="post">
+                                        @Html.AntiForgeryToken()
+
+                                        <input type="hidden"
+                                               name="id"
+                                               value="@notificacion.Id" />
+
+                                        <button type="submit"
+                                                class="btn-notificacion-abrir">
+                                            Marcar como leída
+                                        </button>
+                                    </form>
+                                }
+
+                                <form asp-controller="Notificaciones"
+                                      asp-action="AlternarFavorita"
+                                      method="post">
+                                    @Html.AntiForgeryToken()
+
+                                    <input type="hidden"
+                                           name="id"
+                                           value="@notificacion.Id" />
+
+                                    <button type="submit"
+                                            class="btn-notificacion-accion"
+                                            title="@(notificacion.Favorita ? "Quitar de favoritos" : "Agregar a favoritos")">
+                                        @(notificacion.Favorita ? "★" : "☆")
+                                        <span>
+                                            @(notificacion.Favorita
+                                                ? "Quitar favorita"
+                                                : "Guardar")
+                                        </span>
+                                    </button>
+                                </form>
+
+                                @if (notificacion.Leida)
+                                {
+                                    <form asp-controller="Notificaciones"
+                                          asp-action="MarcarComoNoLeida"
+                                          method="post">
+                                        @Html.AntiForgeryToken()
+
+                                        <input type="hidden"
+                                               name="id"
+                                               value="@notificacion.Id" />
+
+                                        <button type="submit"
+                                                class="btn-notificacion-accion">
+                                            Marcar como no leída
+                                        </button>
+                                    </form>
+                                }
+
+                                <form asp-controller="Notificaciones"
+                                      asp-action="Eliminar"
+                                      method="post"
+                                      onsubmit="return confirm('¿Querés eliminar esta notificación?');">
+                                    @Html.AntiForgeryToken()
+
+                                    <input type="hidden"
+                                           name="id"
+                                           value="@notificacion.Id" />
+
+                                    <button type="submit"
+                                            class="btn-notificacion-eliminar">
+                                        Eliminar
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </article>
+                }
+            </div>
+        }
+    </section>
+
+    <section class="notificaciones-pie">
+        <span aria-hidden="true">✧</span>
+        <p>
+            Algunas historias llegan en forma de libro.
+            Otras, en forma de mensaje.
+        </p>
+    </section>
+</main>
