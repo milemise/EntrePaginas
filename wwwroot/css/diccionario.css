@@ -530,3 +530,97 @@ body {
 .enlace-fuente:hover {
     color: #4f321b;
 }
+
+/* Libro interactivo: conserva la paleta cálida del proyecto y agrega una lectura a doble página. */
+.diccionario-libro-page .diccionario-hero { padding-bottom: 24px; }
+.diccionario-notice { max-width: 1000px; margin: 18px auto; padding: 13px 17px; border: 1px solid #d6bc8f; border-radius: 12px; background: #fbf2df; color: #583b27; }
+.diccionario-notice-error { border-color: #d7b8ad; background: #fff3ee; color: #7c3429; }
+.diccionario-lector { margin: 22px auto 0; width: 100%; max-width: 1160px; }
+.diccionario-libro-marco { padding: 12px; border: 1px solid #806044; border-radius: 18px; background: linear-gradient(125deg, #6b422b, #39251b 52%, #79533b); box-shadow: 0 22px 46px rgba(48, 30, 20, .20), inset 0 0 0 2px rgba(255, 243, 217, .12); perspective: 1800px; }
+.diccionario-libro { position: relative; min-height: 525px; overflow: hidden; border-radius: 10px; background: #f8efdE; }
+.diccionario-libro-lomo { position: absolute; z-index: 4; top: 0; bottom: 0; left: 50%; width: 30px; transform: translateX(-50%); pointer-events: none; background: linear-gradient(90deg, rgba(83, 56, 38, .08), rgba(86, 56, 36, .20) 45%, rgba(255,255,255,.43) 50%, rgba(87,57,36,.15) 60%, rgba(83, 56, 38, .05)); }
+.diccionario-apertura { position: absolute; inset: 0; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); visibility: hidden; opacity: 0; pointer-events: none; transform: rotateY(0deg); transform-style: preserve-3d; backface-visibility: hidden; }
+.diccionario-apertura.is-active { position: relative; visibility: visible; opacity: 1; pointer-events: auto; }
+.diccionario-apertura.is-active.entra-adelante, .diccionario-apertura.is-active.entra-atras { position: absolute; inset: 0; }
+.diccionario-apertura.sale-adelante { z-index: 3; transform-origin: left center; animation: diccionarioPaginaSale .42s ease-in forwards; }
+.diccionario-apertura.entra-adelante { z-index: 2; animation: diccionarioPaginaEntra .42s ease-out both; }
+.diccionario-apertura.sale-atras { z-index: 3; transform-origin: right center; animation: diccionarioPaginaSaleAtras .42s ease-in forwards; }
+.diccionario-apertura.entra-atras { z-index: 2; animation: diccionarioPaginaEntraAtras .42s ease-out both; }
+.diccionario-pagina { position: relative; min-width: 0; min-height: 525px; padding: clamp(24px, 4.6vw, 58px) clamp(22px, 4vw, 50px) 55px; overflow-wrap: anywhere; background-color: #fcf7ec; background-image: repeating-linear-gradient(0deg, transparent 0, transparent 31px, rgba(121, 88, 53, .045) 32px), linear-gradient(90deg, rgba(122, 81, 45, .055), transparent 28px); color: #3a2b21; box-shadow: inset 0 0 20px rgba(92, 62, 39, .06); }
+.diccionario-pagina-izquierda { border-right: 1px solid rgba(110, 76, 47, .12); padding-right: clamp(35px, 5.5vw, 66px); }
+.diccionario-pagina-derecha { border-left: 1px solid rgba(110, 76, 47, .08); padding-left: clamp(35px, 5.5vw, 66px); background-image: repeating-linear-gradient(0deg, transparent 0, transparent 31px, rgba(121, 88, 53, .045) 32px), linear-gradient(270deg, rgba(122, 81, 45, .04), transparent 28px); }
+.pagina-encabezado { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding-bottom: 11px; border-bottom: 1px solid #d9c6a7; color: #886740; font-size: .67rem; font-weight: 800; letter-spacing: .16em; }
+.pagina-flor { color: #b18a4e; font-size: 1.2rem; }
+.pagina-palabra, .pagina-titulo { margin: 34px 0 10px; color: #38271d; font-family: Georgia, "Times New Roman", serif; font-size: clamp(2rem, 4vw, 3.45rem); font-weight: 500; line-height: 1.1; }
+.pagina-titulo { font-size: clamp(1.85rem, 3.5vw, 2.7rem); line-height: 1.2; }
+.pagina-subtitulo { margin: 0; color: #8b6a49; font-family: Georgia, "Times New Roman", serif; font-size: 1.1rem; font-style: italic; }
+.pagina-regla { width: 72px; height: 2px; margin: 23px 0; background: #b18a4e; }
+.pagina-texto-intro { margin: 18px 0; color: #59483b; font-family: Georgia, "Times New Roman", serif; font-size: 1.05rem; line-height: 1.9; }
+.pagina-cita { margin-top: 38px; padding-left: 18px; border-left: 2px solid #b18a4e; color: #795b3f; font-family: Georgia, "Times New Roman", serif; font-size: 1.16rem; font-style: italic; line-height: 1.65; }
+.pagina-seccion-titulo { margin: 26px 0 16px; color: #3f2c20; font-family: Georgia, "Times New Roman", serif; font-size: clamp(1.3rem, 2.5vw, 1.8rem); font-weight: 500; }
+.pagina-definicion { margin: 20px 0; color: #392b22; font-family: Georgia, "Times New Roman", serif; font-size: clamp(1.05rem, 1.7vw, 1.25rem); line-height: 1.95; }
+.pagina-final-regla { margin: 30px 0 22px; border-top: 1px solid #d8c3a2; }
+.pagina-form-favorito { margin: 0; }
+.pagina-nota { display: flex; gap: 12px; align-items: flex-start; margin-top: 30px; padding: 15px 16px; border: 1px solid #e3d2b4; border-radius: 10px; background: rgba(242, 228, 201, .55); }
+.pagina-nota > span { flex: 0 0 auto; color: #aa8143; font-size: 1.2rem; }
+.pagina-nota p { margin: 0; color: #6f5842; font-size: .91rem; line-height: 1.6; }
+.numero-pagina { position: absolute; right: 28px; bottom: 18px; color: #9d8465; font-family: Georgia, "Times New Roman", serif; font-size: .8rem; }
+.pasos-diccionario { display: grid; gap: 17px; margin: 22px 0; padding: 0; list-style: none; counter-reset: paso-diccionario; }
+.pasos-diccionario li { display: grid; grid-template-columns: 34px 1fr; gap: 3px 11px; align-items: start; counter-increment: paso-diccionario; }
+.pasos-diccionario li::before { content: counter(paso-diccionario, decimal-leading-zero); grid-row: span 2; color: #b18a4e; font-family: Georgia, "Times New Roman", serif; font-size: 1.25rem; }
+.pasos-diccionario strong { color: #483222; font-size: .98rem; }
+.pasos-diccionario span, .pagina-texto-secundario { color: #77634f; font-size: .91rem; line-height: 1.65; }
+.pagina-lista-definiciones { display: grid; gap: 16px; padding-left: 22px; color: #4a382a; font-family: Georgia, "Times New Roman", serif; line-height: 1.85; }
+.pagina-lista-definiciones li { padding-left: 5px; }
+.indice-literario { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 5px 12px; margin-top: 18px; }
+.indice-literario a { display: flex; align-items: baseline; gap: 7px; padding: 7px 0; border-bottom: 1px dotted #cbb99c; color: #58402c; font-family: Georgia, "Times New Roman", serif; font-size: .9rem; text-decoration: none; }
+.indice-literario a span { color: #b18a4e; }
+.indice-literario a:hover { color: #9b6236; text-decoration: underline; text-underline-offset: 3px; }
+.pagina-ejemplo { margin: 22px 0; padding: 15px 0 15px 18px; border-left: 2px solid #b18a4e; color: #73563d; font-family: Georgia, "Times New Roman", serif; font-size: 1.12rem; font-style: italic; line-height: 1.8; }
+.pagina-detalles { margin: 22px 0; padding: 12px 14px; border: 1px solid #e0cfb1; border-radius: 10px; background: rgba(242, 228, 201, .48); }
+.pagina-detalles summary { color: #704c2c; font-size: .88rem; font-weight: 700; cursor: pointer; }
+.pagina-detalles p { max-height: 165px; margin: 12px 0 0; overflow: auto; color: #705b48; font-size: .85rem; line-height: 1.65; white-space: pre-line; }
+.pagina-fuente { margin-top: 24px; padding-top: 14px; border-top: 1px solid #d9c6a7; }
+.pagina-fuente > span { color: #97764c; font-size: .63rem; font-weight: 800; letter-spacing: .14em; }
+.pagina-fuente p { margin: 7px 0; color: #62503d; font-size: .9rem; }
+.pagina-fuente a { color: #79512f; font-size: .88rem; font-weight: 700; text-underline-offset: 3px; }
+.palabras-destacadas { display: grid; gap: 13px; margin-top: 20px; }
+.palabras-destacadas a { display: grid; gap: 4px; padding: 13px 15px; border: 1px solid #e0cfb1; border-radius: 10px; background: rgba(255, 253, 248, .6); color: #59422e; text-decoration: none; transition: background .2s, transform .2s; }
+.palabras-destacadas a:hover { transform: translateX(3px); background: #f1e4ce; }
+.palabras-destacadas strong { color: #4e3422; font-family: Georgia, "Times New Roman", serif; font-size: 1.08rem; }
+.palabras-destacadas span { color: #78634d; font-size: .88rem; line-height: 1.5; }
+.diccionario-controles-libro { display: flex; align-items: center; justify-content: space-between; gap: 15px; margin: 20px 6px 0; }
+.control-pagina { display: inline-flex; align-items: center; justify-content: center; gap: 7px; padding: 11px 17px; border: 1px solid #8c6544; border-radius: 999px; background: #fffaf1; color: #674529; font-size: .9rem; font-weight: 700; cursor: pointer; transition: color .2s, background .2s, transform .2s; }
+.control-pagina:hover:not(:disabled) { transform: translateY(-1px); background: #6f492e; color: #fff8eb; }
+.control-pagina:disabled { opacity: .4; cursor: not-allowed; }
+#estadoPaginas { color: #806448; font-size: .85rem; font-weight: 700; text-align: center; }
+.ayuda-pasar-pagina { margin: 12px 0 0; color: #92795f; font-size: .78rem; text-align: center; }
+
+@keyframes diccionarioPaginaSale { from { opacity: 1; transform: rotateY(0deg); } to { opacity: 0; transform: rotateY(-30deg) translateX(-16px); } }
+@keyframes diccionarioPaginaEntra { from { opacity: 0; transform: rotateY(28deg) translateX(18px); } to { opacity: 1; transform: rotateY(0deg) translateX(0); } }
+@keyframes diccionarioPaginaSaleAtras { from { opacity: 1; transform: rotateY(0deg); } to { opacity: 0; transform: rotateY(30deg) translateX(16px); } }
+@keyframes diccionarioPaginaEntraAtras { from { opacity: 0; transform: rotateY(-28deg) translateX(-18px); } to { opacity: 1; transform: rotateY(0deg) translateX(0); } }
+@media (max-width: 780px) {
+    .diccionario-libro-marco { padding: 7px; }
+    .diccionario-libro { min-height: auto; }
+    .diccionario-libro-lomo { display: none; }
+    .diccionario-apertura { grid-template-columns: minmax(0, 1fr); }
+    .diccionario-pagina { min-height: 0; padding: 28px 24px 48px; }
+    .diccionario-pagina-izquierda, .diccionario-pagina-derecha { border: 0; padding-right: 24px; padding-left: 24px; }
+    .diccionario-pagina-izquierda { border-bottom: 1px dashed #cbb99c; }
+    .diccionario-pagina-derecha { box-shadow: inset 0 8px 12px rgba(92, 62, 39, .035); }
+    .diccionario-controles-libro { flex-wrap: wrap; }
+    .control-pagina { flex: 1 1 130px; padding: 10px 12px; }
+    #estadoPaginas { order: -1; width: 100%; }
+    .indice-literario { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 420px) {
+    .diccionario-pagina { padding-right: 18px; padding-left: 18px; }
+    .diccionario-pagina-izquierda, .diccionario-pagina-derecha { padding-right: 18px; padding-left: 18px; }
+    .indice-literario { grid-template-columns: minmax(0, 1fr); }
+    .diccionario-controles-libro { margin-right: 0; margin-left: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .diccionario-apertura.sale-adelante, .diccionario-apertura.entra-adelante, .diccionario-apertura.sale-atras, .diccionario-apertura.entra-atras { animation-duration: .01ms; }
+    .control-pagina, .palabras-destacadas a { transition: none; }
+}

@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using EntrePaginas.Data;
 using EntrePaginas.Models;
+using EntrePaginas.Services;
 using EntrePaginas.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -14,7 +15,12 @@ public class AdminController : Controller
 {
     private const int TamanoPagina = 15;
     private readonly EntrePaginasContext _context;
-    public AdminController(EntrePaginasContext context) => _context = context;
+    private readonly NotificacionService _notificaciones;
+    public AdminController(EntrePaginasContext context, NotificacionService notificaciones)
+    {
+        _context = context;
+        _notificaciones = notificaciones;
+    }
 
     [HttpGet]
     public async Task<IActionResult> Index()
@@ -35,7 +41,8 @@ public class AdminController : Controller
         if (!string.IsNullOrWhiteSpace(buscar))
         {
             var termino = buscar.Trim();
-            consulta = consulta.Where(x => x.Nombre.Contains(termino) || x.Apellido.Contains(termino) || x.NombreUsuario.Contains(termino) || x.Email.Contains(termino));
+            consulta = consulta.Where(x => x.Nombre.Contains(termino) || x.Apellido.Contains(termino)
+                || x.NombreUsuario.Contains(termino) || x.Email.Contains(termino) || x.Dni.Contains(termino));
         }
         consulta = consulta.OrderBy(x => x.Apellido).ThenBy(x => x.Nombre);
         var total = await consulta.CountAsync();
@@ -102,11 +109,11 @@ public class AdminController : Controller
     public async Task<IActionResult> CrearAdministrador(Usuario model)
     {
         ModelState.Remove(nameof(Usuario.Rol));
-        model.Nombre = model.Nombre.Trim();
-        model.Apellido = model.Apellido.Trim();
-        model.NombreUsuario = model.NombreUsuario.Trim();
-        model.Email = model.Email.Trim();
-        model.Dni = model.Dni.Trim();
+        model.Nombre = model.Nombre?.Trim() ?? string.Empty;
+        model.Apellido = model.Apellido?.Trim() ?? string.Empty;
+        model.NombreUsuario = model.NombreUsuario?.Trim().ToLowerInvariant() ?? string.Empty;
+        model.Email = model.Email?.Trim().ToLowerInvariant() ?? string.Empty;
+        model.Dni = model.Dni?.Trim() ?? string.Empty;
         model.Telefono = model.Telefono?.Trim();
 
         if (await _context.Usuarios.AnyAsync(x =>
@@ -152,26 +159,38 @@ public class AdminController : Controller
     }
 
     [HttpGet]
-    public async Task<IActionResult> ResenasReportadas(int pagina = 1)
+    public async Task<IActionResult> ResenasReportadas(string? buscar, int pagina = 1, CancellationToken cancellationToken = default)
     {
         pagina = Math.Max(1, pagina);
-        var consulta = _context.Resenas.AsNoTracking().Include(x => x.Libro).Include(x => x.Lector).Where(x => x.Reportado).OrderByDescending(x => x.FechaComentario);
-        var total = await consulta.CountAsync();
+        var consulta = _context.Resenas.AsNoTracking().Include(x => x.Libro).Include(x => x.Lector)
+            .Where(x => x.Reportado);
+        if (!string.IsNullOrWhiteSpace(buscar))
+        {
+            var termino = buscar.Trim();
+            consulta = consulta.Where(x => x.Libro.Titulo.Contains(termino)
+                || (x.Comentario != null && x.Comentario.Contains(termino))
+                || x.Lector.NombreUsuario.Contains(termino)
+                || x.Lector.Nombre.Contains(termino)
+                || x.Lector.Apellido.Contains(termino));
+        }
+        consulta = consulta.OrderByDescending(x => x.FechaComentario);
+        var total = await consulta.CountAsync(cancellationToken);
         var totalPaginas = Math.Max(1, (int)Math.Ceiling(total / (double)TamanoPagina));
         if (pagina > totalPaginas) pagina = totalPaginas;
         return View(new ResenasAdminViewModel
         {
-            Resenas = await consulta.Skip((pagina - 1) * TamanoPagina).Take(TamanoPagina).ToListAsync(),
-            Pagina = pagina, TotalPaginas = totalPaginas, TotalRegistros = total
+            Resenas = await consulta.Skip((pagina - 1) * TamanoPagina).Take(TamanoPagina).ToListAsync(cancellationToken),
+            Pagina = pagina, TotalPaginas = totalPaginas, TotalRegistros = total, Buscar = buscar
         });
     }
 
     [HttpPost]
     public async Task<IActionResult> DesestimarReporte(int id)
     {
-        var resena = await _context.Resenas.FirstOrDefaultAsync(x => x.Id == id);
+        var resena = await _context.Resenas.Include(x => x.Libro).FirstOrDefaultAsync(x => x.Id == id);
         if (resena is null) return NotFound();
         resena.Reportado = false;
+        _notificaciones.CrearParaUsuario(resena.Libro.IdEscritor, "Moderacion", "Reporte revisado", $"La administración revisó el reporte de una reseña de «{resena.Libro.Titulo}» y decidió mantenerla publicada.", $"/Libros/Detalle/{resena.IdLibro}", "Libro", resena.IdLibro);
         await _context.SaveChangesAsync();
         TempData["Mensaje"] = "El reporte fue desestimado.";
         return RedirectToAction(nameof(ResenasReportadas));

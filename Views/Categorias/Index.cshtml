@@ -12,9 +12,14 @@
             <label for="nombreCategoria">Nombre de la categoría</label>
             <div class="category-editor-row"><input id="nombreCategoria" class="form-control" v-model.trim="nombre" maxlength="100" required placeholder="Ej.: Ciencia ficción" /><button class="detail-primary-button" type="submit" :disabled="guardando">{{ guardando ? 'Guardando...' : (editando ? 'Guardar cambios' : 'Crear categoría') }}</button><button class="detail-secondary-button" type="button" v-on:click="cancelar">Cancelar</button></div>
         </form>
+        <div v-if="!cargando && categorias.length > 0" class="admin-search-form category-search-form">
+            <input class="form-control" type="search" v-model.trim="buscar" maxlength="100" placeholder="Buscar una categoría..." aria-label="Buscar categorías" />
+            <button type="button" class="detail-secondary-button" v-on:click="buscar = ''" v-if="buscar">Limpiar</button>
+        </div>
         <div v-if="cargando" class="muted-note">Cargando categorías...</div>
         <div v-else-if="categorias.length === 0" class="empty-state compact-empty"><h3>No hay categorías</h3><p>Creá la primera para que los escritores puedan clasificar sus obras.</p></div>
-        <div v-else class="table-responsive"><table class="table management-table align-middle"><thead><tr><th>Nombre</th><th>Libros asociados</th><th>Acciones</th></tr></thead><tbody><tr v-for="categoria in categorias" :key="categoria.id"><td><strong>{{ categoria.nombre }}</strong></td><td>{{ categoria.cantidadLibros }}</td><td><div class="row-actions"><button type="button" v-on:click="editar(categoria)">Editar</button><button type="button" class="danger-action" v-on:click="eliminar(categoria)">Eliminar</button></div></td></tr></tbody></table></div>
+        <div v-else-if="categoriasFiltradas.length === 0" class="empty-state compact-empty"><h3>No encontramos esa categoría</h3><p>Probá con otro nombre o limpiá la búsqueda.</p><button type="button" class="detail-secondary-button" v-on:click="buscar = ''">Limpiar búsqueda</button></div>
+        <div v-else class="table-responsive"><table class="table management-table align-middle"><thead><tr><th>Nombre</th><th>Libros asociados</th><th>Acciones</th></tr></thead><tbody><tr v-for="categoria in categoriasFiltradas" :key="categoria.id"><td><strong>{{ categoria.nombre }}</strong></td><td>{{ categoria.cantidadLibros }}</td><td><div class="row-actions"><button type="button" v-on:click="editar(categoria)">Editar</button><button type="button" class="danger-action" v-on:click="eliminar(categoria)">Eliminar</button></div></td></tr></tbody></table></div>
     </section>
 </div></div>
 @section Scripts {
@@ -22,8 +27,8 @@
     <script>
         const { createApp } = Vue;
         createApp({
-            data() { return { categorias: [], nombre: '', idEditando: null, cargando: false, guardando: false, mostrarFormulario: false, mensaje: '', error: '' }; },
-            computed: { editando() { return this.idEditando !== null; } },
+            data() { return { categorias: [], nombre: '', buscar: '', idEditando: null, cargando: false, guardando: false, mostrarFormulario: false, mensaje: '', error: '' }; },
+            computed: { editando() { return this.idEditando !== null; }, categoriasFiltradas() { const q = this.buscar.trim().toLocaleLowerCase('es'); return q ? this.categorias.filter(c => c.nombre.toLocaleLowerCase('es').includes(q)) : this.categorias; } },
             mounted() { this.cargar(); },
             methods: {
                 token() { return document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''; },

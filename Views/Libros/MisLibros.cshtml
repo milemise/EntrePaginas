@@ -1,14 +1,29 @@
 @model LibroListadoViewModel
 @{
     ViewData["Title"] = "Mis libros";
+    var busqueda = Model.Buscar ?? string.Empty;
 }
 <div class="management-page"><div class="management-container">
     <header class="management-header"><span class="library-small-title">ESPACIO DE ESCRITORES</span><h1>Mis libros</h1><p>Administrá tus obras publicadas y revisá cómo aparecen en el catálogo.</p></header>
-    <div class="management-toolbar"><span>@Model.TotalRegistros obras registradas</span><div><a class="detail-secondary-button" asp-controller="Escritores" asp-action="Estadisticas">Ver estadísticas</a><a class="detail-primary-button" asp-action="Crear">+ Publicar libro</a></div></div>
+    <div class="management-toolbar"><span>@Model.TotalRegistros obras encontradas</span><div><a class="detail-secondary-button" asp-controller="Escritores" asp-action="Estadisticas">Ver estadísticas</a><a class="detail-primary-button" asp-action="Crear">+ Publicar libro</a></div></div>
+    <form method="get" asp-controller="Libros" asp-action="MisLibros" class="admin-search-form">
+        <input class="form-control" type="search" name="buscar" value="@busqueda" maxlength="150" placeholder="Buscar por título, autor, descripción o categoría..." aria-label="Buscar mis libros" />
+        <button class="detail-secondary-button" type="submit">Buscar</button>
+        @if (!string.IsNullOrWhiteSpace(busqueda)) { <a class="detail-secondary-button" asp-action="MisLibros">Limpiar</a> }
+    </form>
     <section class="management-card">
         @if (Model.Libros.Count == 0)
         {
-            <div class="empty-state"><h2>Todavía no publicaste libros</h2><p>Usá el buscador de Open Library para ayudarte a completar los datos de tu primera obra.</p><a class="detail-primary-button" asp-action="Crear">Publicar mi primer libro</a></div>
+            <div class="empty-state">
+                @if (!string.IsNullOrWhiteSpace(busqueda))
+                {
+                    <h2>No encontramos obras con esa búsqueda</h2><p>Probá con otro título, autor o categoría.</p><a class="detail-secondary-button" asp-action="MisLibros">Limpiar búsqueda</a>
+                }
+                else
+                {
+                    <h2>Todavía no publicaste libros</h2><p>Usá el buscador de Open Library para ayudarte a completar los datos de tu primera obra.</p><a class="detail-primary-button" asp-action="Crear">Publicar mi primer libro</a>
+                }
+            </div>
         }
         else
         {
@@ -20,7 +35,11 @@
             </tbody></table></div>
             @if (Model.TotalPaginas > 1)
             {
-                <nav class="library-pagination" aria-label="Paginación de mis libros">@if (Model.Pagina > 1) { <a asp-route-pagina="@(Model.Pagina - 1)">← Anterior</a> }<span>Página @Model.Pagina de @Model.TotalPaginas</span>@if (Model.Pagina < Model.TotalPaginas) { <a asp-route-pagina="@(Model.Pagina + 1)">Siguiente →</a> }</nav>
+                <nav class="library-pagination" aria-label="Paginación de mis libros">
+                    @if (Model.Pagina > 1) { <a asp-route-buscar="@busqueda" asp-route-pagina="@(Model.Pagina - 1)">← Anterior</a> }
+                    <span>Página @Model.Pagina de @Model.TotalPaginas</span>
+                    @if (Model.Pagina < Model.TotalPaginas) { <a asp-route-buscar="@busqueda" asp-route-pagina="@(Model.Pagina + 1)">Siguiente →</a> }
+                </nav>
             }
         }
     </section>

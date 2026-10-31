@@ -1,82 +1,46 @@
-
 @model IEnumerable<EntrePaginas.Models.PalabraFavorita>
-
 @{
     ViewData["Title"] = "Mis palabras favoritas";
+    var buscar = ViewBag.Buscar as string ?? string.Empty;
+    var pagina = (int)(ViewBag.Pagina ?? 1);
+    var totalPaginas = (int)(ViewBag.TotalPaginas ?? 1);
+    var favoritos = Model.ToList();
 }
-
 <link rel="stylesheet" href="~/css/diccionario.css" asp-append-version="true" />
-
 <main class="diccionario-page favoritos-page">
     <section class="favoritos-encabezado">
-        <span class="diccionario-eyebrow">TU BIBLIOTECA DE PALABRAS</span>
-        <h1>Mis palabras favoritas</h1>
-        <p>
-            Un rincón para conservar esas palabras que querés recordar.
-        </p>
-
-        <a asp-controller="Diccionario" asp-action="Index"
-           class="volver-diccionario">
-            ← Volver al diccionario
-        </a>
+        <span class="diccionario-eyebrow">TU BIBLIOTECA DE PALABRAS</span><h1>Mis palabras favoritas</h1>
+        <p>Un rincón para conservar esas palabras que querés recordar.</p>
+        <a asp-controller="Diccionario" asp-action="Index" class="volver-diccionario">← Volver al diccionario</a>
     </section>
-
-    @if (TempData["MensajeDiccionario"] is string mensaje)
-    {
-        <div class="diccionario-notice" role="status">
-            @mensaje
-        </div>
-    }
-
-    @if (Model.Any())
+    @if (TempData["MensajeDiccionario"] is string mensaje) { <div class="diccionario-notice" role="status">@mensaje</div> }
+    <form method="get" asp-controller="Diccionario" asp-action="Favoritos" class="diccionario-search favoritos-busqueda">
+        <label class="visually-hidden" for="buscarFavoritos">Buscar palabras favoritas</label>
+        <input id="buscarFavoritos" type="search" name="buscar" value="@buscar" maxlength="150" placeholder="Buscar entre tus palabras guardadas..." />
+        <button type="submit">Buscar</button>
+        @if (!string.IsNullOrWhiteSpace(buscar)) { <a class="btn-favoritos" asp-action="Favoritos">Limpiar</a> }
+    </form>
+    @if (favoritos.Count > 0)
     {
         <div class="favoritos-lista">
-            @foreach (var favorito in Model)
+            @foreach (var favorito in favoritos)
             {
                 <article class="favorito-item">
-                    <div class="favorito-info">
-                        <span class="termino-simbolo" aria-hidden="true">✧</span>
-                        <div>
-                            <h2>@favorito.Palabra</h2>
-                            <time datetime="@favorito.FechaAgregado.ToString("yyyy-MM-ddTHH:mm:ss")">
-                                Guardada el @favorito.FechaAgregado.ToString("dd/MM/yyyy")
-                            </time>
-                        </div>
-                    </div>
-
+                    <div class="favorito-info"><span class="termino-simbolo" aria-hidden="true">✧</span><div><h2>@favorito.Palabra</h2><time datetime="@favorito.FechaAgregado.ToString("yyyy-MM-ddTHH:mm:ss")">Guardada el @favorito.FechaAgregado.ToString("dd/MM/yyyy")</time></div></div>
                     <div class="favorito-acciones">
-                        <a asp-controller="Diccionario"
-                           asp-action="Index"
-                           asp-route-busqueda="@favorito.Palabra">
-                            Ver definición
-                        </a>
-
-                        <form asp-controller="Diccionario"
-                              asp-action="QuitarFavorito"
-                              method="post">
-                            <input type="hidden" name="id" value="@favorito.Id" />
-                            <button type="submit" class="btn-quitar">
-                                Quitar
-                            </button>
-                        </form>
+                        <a asp-controller="Diccionario" asp-action="Index" asp-route-busqueda="@favorito.Palabra">Ver definición</a>
+                        <form asp-controller="Diccionario" asp-action="QuitarFavorito" method="post"><input type="hidden" name="id" value="@favorito.Id" /><button type="submit" class="btn-quitar">Quitar</button></form>
                     </div>
                 </article>
             }
         </div>
+        @if (totalPaginas > 1) { <nav class="library-pagination" aria-label="Paginación de palabras favoritas">@if (pagina > 1) { <a asp-route-buscar="@buscar" asp-route-pagina="@(pagina - 1)">← Anterior</a> }<span>Página @pagina de @totalPaginas</span>@if (pagina < totalPaginas) { <a asp-route-buscar="@buscar" asp-route-pagina="@(pagina + 1)">Siguiente →</a> }</nav> }
     }
     else
     {
-        <section class="favoritos-vacios">
-            <span aria-hidden="true">♡</span>
-            <h2>Todavía no guardaste palabras</h2>
-            <p>
-                Explorá el diccionario y guardá las palabras que quieras
-                conservar en tu colección.
-            </p>
-            <a asp-controller="Diccionario" asp-action="Index"
-               class="btn-favoritos">
-                Explorar el diccionario
-            </a>
+        <section class="favoritos-vacios"><span aria-hidden="true">♡</span>
+            @if (!string.IsNullOrWhiteSpace(buscar)) { <h2>No encontramos palabras con esa búsqueda</h2><p>Probá con otro término o limpiá el filtro.</p><a class="btn-favoritos" asp-action="Favoritos">Ver todas mis palabras</a> }
+            else { <h2>Todavía no guardaste palabras</h2><p>Explorá el diccionario y guardá las palabras que quieras conservar en tu colección.</p><a asp-controller="Diccionario" asp-action="Index" class="btn-favoritos">Explorar el diccionario</a> }
         </section>
     }
 </main>

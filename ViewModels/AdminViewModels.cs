@@ -17,6 +17,7 @@ public class ResenasAdminViewModel
     public int Pagina { get; set; } = 1;
     public int TotalPaginas { get; set; } = 1;
     public int TotalRegistros { get; set; }
+    public string? Buscar { get; set; }
 }
 
 public class EstadisticasEscritorViewModel
@@ -27,6 +28,10 @@ public class EstadisticasEscritorViewModel
     public decimal IngresosVentas { get; set; }
     public decimal IngresosAlquileres { get; set; }
     public IReadOnlyList<LibroEstadisticaItem> Libros { get; set; } = Array.Empty<LibroEstadisticaItem>();
+    public string? Buscar { get; set; }
+    public int Pagina { get; set; } = 1;
+    public int TotalPaginas { get; set; } = 1;
+    public int TotalRegistros { get; set; }
 }
 
 public class LibroEstadisticaItem

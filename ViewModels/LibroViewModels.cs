@@ -57,6 +57,8 @@ public class LibroDetalleViewModel
     public int PaginaResenas { get; set; } = 1;
     public int TotalPaginasResenas { get; set; } = 1;
     public int TotalResenas { get; set; }
+    public int TotalResenasFiltradas { get; set; }
+    public string? BuscarResena { get; set; }
     public double PromedioResenas { get; set; }
 }
 
@@ -71,7 +73,7 @@ public class PaginacionViewModel<T>
 public class ReviewFormViewModel
 {
     public int IdLibro { get; set; }
-    [Range(1, 5)] public int Puntuacion { get; set; } = 5;
+    [Range(1, 5)] public int Puntuacion { get; set; }
     [StringLength(3000)] public string? Comentario { get; set; }
     public bool Anonimo { get; set; }
 }

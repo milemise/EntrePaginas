@@ -16,12 +16,14 @@ public class LibrosController : Controller
     private readonly EntrePaginasContext _context;
     private readonly UploadStorageService _storage;
     private readonly OpenLibraryService _openLibrary;
+    private readonly NotificacionService _notificaciones;
 
-    public LibrosController(EntrePaginasContext context, UploadStorageService storage, OpenLibraryService openLibrary)
+    public LibrosController(EntrePaginasContext context, UploadStorageService storage, OpenLibraryService openLibrary, NotificacionService notificaciones)
     {
         _context = context;
         _storage = storage;
         _openLibrary = openLibrary;
+        _notificaciones = notificaciones;
     }
 
     [AllowAnonymous]
@@ -29,11 +31,17 @@ public class LibrosController : Controller
     public async Task<IActionResult> Index(string? buscar, int? categoriaId, string? ordenar, int pagina = 1)
     {
         pagina = Math.Max(1, pagina);
+        buscar = buscar?.Trim();
         var consulta = _context.Libros.AsNoTracking().Include(x => x.Categoria).Include(x => x.Escritor).AsQueryable();
         if (!string.IsNullOrWhiteSpace(buscar))
         {
-            var termino = buscar.Trim();
-            consulta = consulta.Where(x => x.Titulo.Contains(termino) || (x.Descripcion != null && x.Descripcion.Contains(termino)) || x.Escritor.Nombre.Contains(termino) || x.Escritor.Apellido.Contains(termino));
+            var termino = buscar;
+            consulta = consulta.Where(x => x.Titulo.Contains(termino)
+                || (x.Autor != null && x.Autor.Contains(termino))
+                || (x.Descripcion != null && x.Descripcion.Contains(termino))
+                || x.Categoria.Nombre.Contains(termino)
+                || x.Escritor.Nombre.Contains(termino)
+                || x.Escritor.Apellido.Contains(termino));
         }
         if (categoriaId.HasValue) consulta = consulta.Where(x => x.IdCategoria == categoriaId.Value);
         consulta = ordenar switch
@@ -63,20 +71,30 @@ public class LibrosController : Controller
 
     [AllowAnonymous]
     [HttpGet]
-    public async Task<IActionResult> Detalle(int id, int paginaResenas = 1)
+    public async Task<IActionResult> Detalle(int id, int paginaResenas = 1, string? buscarResena = null, CancellationToken cancellationToken = default)
     {
         var libro = await _context.Libros.AsNoTracking()
             .Include(x => x.Categoria).Include(x => x.Escritor).Include(x => x.LibroAnterior)
             .Include(x => x.LibrosSiguientes)
-            .FirstOrDefaultAsync(x => x.Id == id);
+            .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
         if (libro is null) return NotFound();
 
-        var totalResenas = await _context.Resenas.CountAsync(x => x.IdLibro == id);
-        var promedioResenas = await _context.Resenas.Where(x => x.IdLibro == id).AverageAsync(x => (double?)x.Puntuacion) ?? 0;
-        var totalPaginasResenas = Math.Max(1, (int)Math.Ceiling(totalResenas / 5.0));
+        var totalResenas = await _context.Resenas.CountAsync(x => x.IdLibro == id, cancellationToken);
+        var promedioResenas = await _context.Resenas.Where(x => x.IdLibro == id).AverageAsync(x => (double?)x.Puntuacion, cancellationToken) ?? 0;
+        var consultaResenas = _context.Resenas.AsNoTracking().Where(x => x.IdLibro == id);
+        if (!string.IsNullOrWhiteSpace(buscarResena))
+        {
+            buscarResena = buscarResena.Trim();
+            consultaResenas = consultaResenas.Where(x =>
+                (x.Comentario != null && x.Comentario.Contains(buscarResena)) ||
+                (!x.Anonimo && (x.Lector.Nombre.Contains(buscarResena) || x.Lector.Apellido.Contains(buscarResena) || x.Lector.NombreUsuario.Contains(buscarResena))));
+        }
+        var totalResenasFiltradas = await consultaResenas.CountAsync(cancellationToken);
+        var totalPaginasResenas = Math.Max(1, (int)Math.Ceiling(totalResenasFiltradas / 5.0));
         paginaResenas = Math.Clamp(paginaResenas, 1, totalPaginasResenas);
-        libro.Resenas = await _context.Resenas.AsNoTracking().Include(x => x.Lector).Where(x => x.IdLibro == id)
-            .OrderByDescending(x => x.FechaComentario).Skip((paginaResenas - 1) * 5).Take(5).ToListAsync();
+        libro.Resenas = await consultaResenas.Include(x => x.Lector)
+            .OrderByDescending(x => x.FechaComentario).ThenByDescending(x => x.Id)
+            .Skip((paginaResenas - 1) * 5).Take(5).ToListAsync(cancellationToken);
 
         var bloqueado = false;
         var motivo = (string?)null;
@@ -86,7 +104,7 @@ public class LibrosController : Controller
         var esLibroPropio = false;
         var puedeResenar = false;
         int? miResenaId = null;
-        if (User.Identity?.IsAuthenticated == true && int.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var usuarioId))
+        if (User.Identity?.IsAuthenticated == true && User.IsInRole(RolesAplicacion.Lector) && int.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var usuarioId))
         {
             var usuario = await _context.Usuarios.AsNoTracking().FirstOrDefaultAsync(x => x.Id == usuarioId);
             if (usuario is null) return Challenge();
@@ -100,34 +118,46 @@ public class LibrosController : Controller
             alquilerVigente = await _context.Alquileres.AnyAsync(x => x.IdLibro == id && x.IdLector == usuarioId && x.Activo && x.FechaInicio <= DateTime.Now && x.FechaHasta >= DateTime.Now);
             yaCompro = compraVigente;
             puedeResenar =
-                await _context.Compras.AnyAsync(x => x.IdLibro == id && x.IdLector == usuarioId && !x.Devuelto) ||
-                await _context.Alquileres.AnyAsync(x => x.IdLibro == id && x.IdLector == usuarioId && x.Activo && x.FechaInicio <= DateTime.Now && x.FechaHasta >= DateTime.Now);
+                await _context.Compras.AnyAsync(x => x.IdLibro == id && x.IdLector == usuarioId) ||
+                await _context.Alquileres.AnyAsync(x => x.IdLibro == id && x.IdLector == usuarioId);
             miResenaId = (await _context.Resenas.AsNoTracking().FirstOrDefaultAsync(x => x.IdLibro == id && x.IdLector == usuarioId))?.Id;
         }
 
         return View(new LibroDetalleViewModel
         {
             Libro = libro, ContenidoBloqueado = bloqueado, MotivoBloqueo = motivo,
-            PuedeComprar = User.Identity?.IsAuthenticated == true && !esLibroPropio && !bloqueado && !compraVigente,
-            PuedeAlquilar = User.Identity?.IsAuthenticated == true && !esLibroPropio && !bloqueado && !alquilerVigente && !compraVigente,
+            PuedeComprar = User.IsInRole(RolesAplicacion.Lector) && !esLibroPropio && !bloqueado && !compraVigente,
+            PuedeAlquilar = User.IsInRole(RolesAplicacion.Lector) && !esLibroPropio && !bloqueado && !alquilerVigente && !compraVigente,
             PuedeResenar = puedeResenar, YaCompro = yaCompro, AlquilerVigente = alquilerVigente,
             CompraVigente = compraVigente, MiResenaId = miResenaId, PaginaResenas = paginaResenas,
-            TotalPaginasResenas = totalPaginasResenas, TotalResenas = totalResenas, PromedioResenas = promedioResenas
+            TotalPaginasResenas = totalPaginasResenas, TotalResenas = totalResenas,
+            TotalResenasFiltradas = totalResenasFiltradas, BuscarResena = buscarResena,
+            PromedioResenas = promedioResenas
         });
     }
 
     [Authorize(Roles = RolesAplicacion.Escritor)]
     [HttpGet]
-    public async Task<IActionResult> MisLibros(int pagina = 1)
+    public async Task<IActionResult> MisLibros(string? buscar, int pagina = 1, CancellationToken cancellationToken = default)
     {
         pagina = Math.Max(1, pagina);
         var idUsuario = ObtenerIdUsuario();
-        var consulta = _context.Libros.AsNoTracking().Include(x => x.Categoria).Where(x => x.IdEscritor == idUsuario).OrderByDescending(x => x.Id);
-        var total = await consulta.CountAsync();
+        var consulta = _context.Libros.AsNoTracking().Include(x => x.Categoria)
+            .Where(x => x.IdEscritor == idUsuario);
+        if (!string.IsNullOrWhiteSpace(buscar))
+        {
+            var termino = buscar.Trim();
+            consulta = consulta.Where(x => x.Titulo.Contains(termino)
+                || (x.Autor != null && x.Autor.Contains(termino))
+                || (x.Descripcion != null && x.Descripcion.Contains(termino))
+                || x.Categoria.Nombre.Contains(termino));
+        }
+        consulta = consulta.OrderByDescending(x => x.Id);
+        var total = await consulta.CountAsync(cancellationToken);
         var totalPaginas = Math.Max(1, (int)Math.Ceiling(total / (double)TamanoPagina));
         if (pagina > totalPaginas) pagina = totalPaginas;
-        var libros = await consulta.Skip((pagina - 1) * TamanoPagina).Take(TamanoPagina).ToListAsync();
-        return View(new LibroListadoViewModel { Libros = libros, Pagina = pagina, TotalPaginas = totalPaginas, TotalRegistros = total });
+        var libros = await consulta.Skip((pagina - 1) * TamanoPagina).Take(TamanoPagina).ToListAsync(cancellationToken);
+        return View(new LibroListadoViewModel { Libros = libros, Pagina = pagina, TotalPaginas = totalPaginas, TotalRegistros = total, Buscar = buscar });
     }
 
     [Authorize(Roles = RolesAplicacion.Escritor)]
@@ -300,8 +330,10 @@ public class LibrosController : Controller
     {
         if (string.IsNullOrWhiteSpace(termino) || termino.Trim().Length < 2) return Json(new { items = Array.Empty<object>() });
         var idUsuario = ObtenerIdUsuario();
-        var items = await _context.Libros.AsNoTracking().Where(x => x.IdEscritor == idUsuario && x.Titulo.Contains(termino.Trim()))
-            .OrderBy(x => x.Titulo).Take(10).Select(x => new { id = x.Id, titulo = x.Titulo }).ToListAsync(cancellationToken);
+        var busqueda = termino.Trim();
+        var items = await _context.Libros.AsNoTracking().Where(x => x.IdEscritor == idUsuario
+                && (x.Titulo.Contains(busqueda) || (x.Autor != null && x.Autor.Contains(busqueda))))
+            .OrderBy(x => x.Titulo).Take(10).Select(x => new { id = x.Id, titulo = x.Titulo, autor = x.Autor }).ToListAsync(cancellationToken);
         return Json(new { items });
     }
 
@@ -321,7 +353,7 @@ public class LibrosController : Controller
         }
     }
 
-    [Authorize]
+    [Authorize(Roles = RolesAplicacion.Lector)]
     [HttpPost]
     public async Task<IActionResult> Comprar(int id)
     {
@@ -344,12 +376,14 @@ public class LibrosController : Controller
             return RedirectToAction(nameof(Detalle), new { id });
         }
         _context.Compras.Add(new Compra { IdLibro = id, IdLector = usuarioId, FechaCompra = DateTime.Now, Importe = libro.PrecioCompra });
+        _notificaciones.CrearParaUsuario(usuarioId, "Compra", "Compra registrada", $"La compra de «{libro.Titulo}» quedó registrada. Ya podés acceder al libro desde tu biblioteca.", "/Biblioteca/Compras", "Libro", id);
+        _notificaciones.CrearParaUsuario(libro.IdEscritor, "Venta", "Nueva compra de una obra", $"Un lector compró «{libro.Titulo}».", "/Escritores/Estadisticas", "Libro", id);
         await _context.SaveChangesAsync();
         TempData["Mensaje"] = "Compra registrada. El libro ya está disponible en tu biblioteca.";
         return RedirectToAction("Compras", "Biblioteca");
     }
 
-    [Authorize]
+    [Authorize(Roles = RolesAplicacion.Lector)]
     [HttpPost]
     public async Task<IActionResult> Alquilar(int id, int dias = 7)
     {
@@ -382,12 +416,14 @@ public class LibrosController : Controller
             IdLibro = id, IdLector = usuarioId, FechaInicio = DateTime.Now,
             FechaHasta = DateTime.Now.AddDays(dias), Importe = libro.PrecioAlquiler, Activo = true
         });
+        _notificaciones.CrearParaUsuario(usuarioId, "Alquiler", "Alquiler registrado", $"El alquiler de «{libro.Titulo}» estará disponible hasta el {DateTime.Now.AddDays(dias):dd/MM/yyyy}.", "/Biblioteca/Alquileres", "Libro", id);
+        _notificaciones.CrearParaUsuario(libro.IdEscritor, "Alquiler", "Nuevo alquiler de una obra", $"Un lector alquiló «{libro.Titulo}» por {dias} días.", "/Escritores/Estadisticas", "Libro", id);
         await _context.SaveChangesAsync();
         TempData["Mensaje"] = $"Alquiler registrado por {dias} días. Podés leerlo online mientras esté vigente.";
         return RedirectToAction("Alquileres", "Biblioteca");
     }
 
-    [Authorize]
+    [Authorize(Roles = RolesAplicacion.Lector)]
     [HttpPost]
     public async Task<IActionResult> DevolverCompra(int id)
     {
@@ -405,7 +441,7 @@ public class LibrosController : Controller
         return RedirectToAction("Compras", "Biblioteca");
     }
 
-    [Authorize]
+    [Authorize(Roles = RolesAplicacion.Lector)]
     [HttpGet]
     public async Task<IActionResult> Descargar(int id)
     {
@@ -426,7 +462,7 @@ public class LibrosController : Controller
         return PhysicalFile(ruta, mime, $"{NombreArchivoSeguro(libro.Titulo)}{Path.GetExtension(ruta)}");
     }
 
-    [Authorize]
+    [Authorize(Roles = RolesAplicacion.Lector)]
     [HttpGet]
     public async Task<IActionResult> Leer(int id)
     {

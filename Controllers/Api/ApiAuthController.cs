@@ -23,12 +23,13 @@ public class ApiAuthController : ControllerBase
     }
 
     [HttpPost("token")]
-    public async Task<IActionResult> Token([FromBody] TokenRequest request, CancellationToken cancellationToken)
+    public async Task<IActionResult> Token([FromBody] TokenRequest? request, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrWhiteSpace(request.Usuario) || string.IsNullOrWhiteSpace(request.Password))
+        if (request is null || string.IsNullOrWhiteSpace(request.Usuario) || string.IsNullOrWhiteSpace(request.Password))
             return BadRequest(new { mensaje = "Ingresá usuario/correo y contraseña." });
+        var identificador = request.Usuario.Trim().ToLowerInvariant();
         var usuario = await _context.Usuarios.AsNoTracking()
-            .FirstOrDefaultAsync(x => x.NombreUsuario == request.Usuario.Trim() || x.Email == request.Usuario.Trim(), cancellationToken);
+            .FirstOrDefaultAsync(x => x.NombreUsuario.ToLower() == identificador || x.Email.ToLower() == identificador, cancellationToken);
         if (usuario is null || !BCrypt.Net.BCrypt.Verify(request.Password, usuario.Password))
             return Unauthorized(new { mensaje = "Credenciales incorrectas." });
 

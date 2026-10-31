@@ -11,7 +11,7 @@
             <p>Buscá tu próxima lectura entre las historias disponibles.</p>
         </div>
         <form class="library-search" method="get" asp-controller="Libros" asp-action="Index">
-            <div class="library-search-input"><span>⌕</span><input type="search" name="buscar" value="@Model.Buscar" placeholder="Buscar por título, autor o descripción..." aria-label="Buscar libros" /></div>
+            <div class="library-search-input"><span>⌕</span><input type="search" name="buscar" value="@Model.Buscar" placeholder="Buscar por título, autor, descripción o categoría..." aria-label="Buscar libros" /></div>
             <button type="submit" class="library-search-button">Buscar</button>
         </form>
         <div class="library-filters">
@@ -37,7 +37,7 @@
         </div>
         @if (Model.Libros.Count == 0)
         {
-            <div class="empty-state"><h2>No encontramos libros con esa búsqueda</h2><p>Probá con otro título, autor o género.</p><a asp-action="Index" class="book-button">Limpiar filtros</a></div>
+            <div class="empty-state"><h2>@(string.IsNullOrWhiteSpace(Model.Buscar) && Model.CategoriaId is null ? "Todavía no hay libros publicados" : "No encontramos libros con esos filtros")</h2><p>Probá con otro título, autor o género, o quitá los filtros para ver todo el catálogo.</p><a asp-action="Index" class="book-button">Limpiar filtros</a></div>
         }
         else
         {

@@ -1,176 +1,250 @@
-
 @model EntrePaginas.ViewModels.DiccionarioViewModel
 
 @{
     ViewData["Title"] = "Diccionario";
+    var resultado = Model.Resultado;
+    var primeraDefinicion = resultado?.Definiciones.FirstOrDefault();
 }
 
 <link rel="stylesheet" href="~/css/diccionario.css" asp-append-version="true" />
 
-<main class="diccionario-page">
+<main class="diccionario-page diccionario-libro-page">
     <section class="diccionario-hero">
         <span class="diccionario-eyebrow">EL ARTE DE LAS PALABRAS</span>
         <h1>Diccionario de Entre Páginas</h1>
-        <p>
-            Cada palabra guarda una historia.
-            Encontrá su significado y descubrí nuevas formas de expresarte.
-        </p>
+        <p>Cada palabra guarda una historia. Abrí el libro, buscá un término y descubrí nuevas formas de expresarte.</p>
 
-        <form asp-controller="Diccionario"
-              asp-action="Index"
-              method="get"
-              class="diccionario-search">
-            <label for="busqueda" class="visually-hidden">
-                Buscar una palabra
-            </label>
-            <input id="busqueda"
-                   name="busqueda"
-                   value="@Model.Busqueda"
-                   maxlength="150"
-                   placeholder="¿Qué palabra querés descubrir?"
-                   autocomplete="off"
-                   required />
+        <form asp-controller="Diccionario" asp-action="Index" method="get" class="diccionario-search">
+            <label for="busqueda" class="visually-hidden">Buscar una palabra</label>
+            <input id="busqueda" name="busqueda" value="@Model.Busqueda" maxlength="150" placeholder="¿Qué palabra querés descubrir?" autocomplete="off" required />
             <button type="submit">Buscar</button>
         </form>
-        
-        <div class="diccionario-quick-links">
-            @if (User.Identity?.IsAuthenticated == true &&
-                Model.PalabrasFavoritas.Any())
+
+        <div class="diccionario-quick-links" aria-label="Búsquedas sugeridas">
+            @if (User.Identity?.IsAuthenticated == true && Model.PalabrasFavoritas.Any())
             {
-                @foreach (var palabra in Model.PalabrasFavoritas)
+                @foreach (var palabra in Model.PalabrasFavoritas.Take(5))
                 {
-                    <a asp-controller="Diccionario"
-                    asp-action="Index"
-                    asp-route-busqueda="@palabra">
-                        @palabra
-                    </a>
+                    <a asp-controller="Diccionario" asp-action="Index" asp-route-busqueda="@palabra">@palabra</a>
                 }
             }
             else
             {
-                <a asp-controller="Diccionario"
-                asp-action="Index"
-                asp-route-busqueda="serendipia">
-                    Serendipia
-                </a>
-
-                <a asp-controller="Diccionario"
-                asp-action="Index"
-                asp-route-busqueda="nostalgia">
-                    Nostalgia
-                </a>
-
-                <a asp-controller="Diccionario"
-                asp-action="Index"
-                asp-route-busqueda="efímero">
-                    Efímero
-                </a>
+                <a asp-controller="Diccionario" asp-action="Index" asp-route-busqueda="serendipia">Serendipia</a>
+                <a asp-controller="Diccionario" asp-action="Index" asp-route-busqueda="nostalgia">Nostalgia</a>
+                <a asp-controller="Diccionario" asp-action="Index" asp-route-busqueda="efímero">Efímero</a>
             }
         </div>
-
     </section>
 
     @if (TempData["MensajeDiccionario"] is string mensaje)
     {
-        <div class="diccionario-notice" role="status">
-            @mensaje
-        </div>
+        <div class="diccionario-notice" role="status">@mensaje</div>
     }
-    
-    @if (Model.Resultado != null)
-    {
-        <section class="resultado-diccionario">
-            <div class="definicion-heading">
-                <h2>@Model.Resultado.Palabra</h2>
+    <section class="diccionario-lector" aria-label="Libro interactivo del diccionario">
+        <div class="diccionario-libro-marco">
+            <div class="diccionario-libro" id="diccionarioLibro" data-spread-inicial="0">
+                <div class="diccionario-libro-lomo" aria-hidden="true"></div>
 
-                @if (User.Identity?.IsAuthenticated == true)
-                {
-                    <form asp-controller="Diccionario"
-                        asp-action="AgregarFavorito"
-                        method="post">
-                        @Html.AntiForgeryToken()
+                <div class="diccionario-apertura is-active" data-apertura="0" aria-hidden="false">
+                    <article class="diccionario-pagina diccionario-pagina-izquierda">
+                        @if (resultado != null)
+                        {
+                            <div class="pagina-encabezado"><span>ENTRADA DEL DICCIONARIO</span><span class="pagina-flor" aria-hidden="true">✦</span></div>
+                            <h2 class="pagina-palabra">@resultado.Palabra</h2>
+                            <p class="pagina-subtitulo">Una palabra, una historia.</p>
+                            <div class="pagina-regla"></div>
+                            <p class="pagina-texto-intro">Leé el significado principal en la página derecha. En la siguiente apertura vas a encontrar más información, ejemplos y la fuente de consulta.</p>
+                            <div class="pagina-nota"><span>✧</span><p>Las definiciones pueden variar según el contexto. Usá cada palabra como punto de partida para seguir leyendo.</p></div>
+                        }
+                        else if (!string.IsNullOrWhiteSpace(Model.Busqueda))
+                        {
+                            <div class="pagina-encabezado"><span>ENTRADA NO DISPONIBLE</span><span class="pagina-flor" aria-hidden="true">✦</span></div>
+                            <h2 class="pagina-palabra">@Model.Busqueda</h2>
+                            <div class="pagina-regla"></div>
+                            <p class="pagina-texto-intro">@(!string.IsNullOrWhiteSpace(Model.Mensaje) ? Model.Mensaje : "No encontramos una definición para esta palabra. Revisá la escritura o probá con otro término.")</p>
+                            <div class="pagina-nota"><span>✧</span><p>También podés recorrer el índice literario de las próximas páginas.</p></div>
+                        }
+                        else
+                        {
+                            <div class="pagina-encabezado"><span>PRÓLOGO</span><span class="pagina-flor" aria-hidden="true">✦</span></div>
+                            <h2 class="pagina-titulo">Las palabras también se leen</h2>
+                            <div class="pagina-regla"></div>
+                            <p class="pagina-texto-intro">Este diccionario es un pequeño lugar para detenerse, buscar el sentido de una palabra y descubrir cómo puede enriquecer una historia.</p>
+                            <p class="pagina-texto-intro">Escribí una palabra en el buscador de arriba o pasá la página para recorrer nuestro índice de términos literarios.</p>
+                            <div class="pagina-cita">«Nombrar algo es empezar a descubrirlo».</div>
+                        }
+                        <span class="numero-pagina">01</span>
+                    </article>
 
-                        <input type="hidden"
-                            name="palabra"
-                            value="@Model.Resultado.Palabra" />
-
-                        <button type="submit" class="btn-favorito">
-                            ♡ Agregar a favoritos
-                        </button>
-                    </form>
-                }
-                else
-                {
-                    <a asp-controller="Cuenta"
-                    asp-action="Login"
-                    class="btn-favorito">
-                        ♡ Iniciá sesión para guardar
-                    </a>
-                }
-            </div>
-
-            <div class="definicion-palabra">
-                <h3>Significado</h3>
-
-                @if (Model.Resultado.Definiciones.Any())
-                {
-                    <p>@Model.Resultado.Definiciones.First()</p>
-                }
-                else if (!string.IsNullOrWhiteSpace(Model.Resultado.Contenido))
-                {
-                    <p>@Model.Resultado.Contenido</p>
-                }
-                else
-                {
-                    <p>No se encontró una definición breve para esta palabra.</p>
-                }
-            </div>
-
-            @if (Model.Resultado.Ejemplos.Any())
-            {
-                <div class="ejemplo-palabra">
-                    <h3>Ejemplo</h3>
-                    <p>
-                        <em>“@Model.Resultado.Ejemplos.First()”</em>
-                    </p>
+                    <article class="diccionario-pagina diccionario-pagina-derecha">
+                        @if (resultado != null)
+                        {
+                            <div class="pagina-encabezado"><span>SIGNIFICADO</span><span class="pagina-flor" aria-hidden="true">❧</span></div>
+                            <h3 class="pagina-seccion-titulo">Definición principal</h3>
+                            @if (!string.IsNullOrWhiteSpace(primeraDefinicion))
+                            {
+                                <p class="pagina-definicion">@primeraDefinicion</p>
+                            }
+                            else if (!string.IsNullOrWhiteSpace(resultado.Contenido))
+                            {
+                                <p class="pagina-definicion">@resultado.Contenido</p>
+                            }
+                            else
+                            {
+                                <p class="pagina-definicion">No encontramos una definición breve para esta entrada. Pasá a la siguiente página para revisar la información disponible.</p>
+                            }
+                            <div class="pagina-final-regla"></div>
+                            @if (Model.EsUsuarioAutenticado)
+                            {
+                                <form asp-controller="Diccionario" asp-action="AgregarFavorito" method="post" class="pagina-form-favorito">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="palabra" value="@resultado.Palabra" />
+                                    <button type="submit" class="btn-favorito">♡ Guardar en mis palabras</button>
+                                </form>
+                            }
+                            else
+                            {
+                                <a asp-controller="Cuenta" asp-action="Login" class="btn-favorito">♡ Iniciá sesión para guardar</a>
+                            }
+                        }
+                        else if (!string.IsNullOrWhiteSpace(Model.Busqueda))
+                        {
+                            <div class="pagina-encabezado"><span>UNA NUEVA BÚSQUEDA</span><span class="pagina-flor" aria-hidden="true">❧</span></div>
+                            <h3 class="pagina-seccion-titulo">Probá con otra palabra</h3>
+                            <ol class="pasos-diccionario">
+                                <li><strong>Revisá</strong><span>Comprobá que la palabra esté bien escrita.</span></li>
+                                <li><strong>Acotá</strong><span>Probá con el término principal, sin una frase larga.</span></li>
+                                <li><strong>Explorá</strong><span>Usá el índice de la próxima apertura para encontrar términos literarios.</span></li>
+                            </ol>
+                        }
+                        else
+                        {
+                            <div class="pagina-encabezado"><span>CÓMO EXPLORAR</span><span class="pagina-flor" aria-hidden="true">❧</span></div>
+                            <h3 class="pagina-seccion-titulo">Una búsqueda sencilla</h3>
+                            <ol class="pasos-diccionario">
+                                <li><strong>Buscá</strong><span>Escribí la palabra que te genera curiosidad.</span></li>
+                                <li><strong>Leé</strong><span>Revisá su significado, ejemplos y contexto.</span></li>
+                                <li><strong>Guardá</strong><span>Conservá tus palabras favoritas en tu cuenta.</span></li>
+                            </ol>
+                            <p class="pagina-texto-secundario">Las búsquedas literarias más frecuentes están reunidas en el índice de la próxima apertura.</p>
+                        }
+                        <span class="numero-pagina">02</span>
+                    </article>
                 </div>
-            }
 
-            @if (!string.IsNullOrWhiteSpace(Model.Resultado.UrlFuente))
-            {
-                <a href="@Model.Resultado.UrlFuente"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="enlace-fuente">
-                    Ver más información sobre esta palabra
-                    <span aria-hidden="true">↗</span>
-                </a>
-            }
-        </section>
-    }
+                <div class="diccionario-apertura" data-apertura="1" aria-hidden="true" inert>
+                    <article class="diccionario-pagina diccionario-pagina-izquierda">
+                        @if (resultado != null)
+                        {
+                            <div class="pagina-encabezado"><span>OTRAS ACEPCIONES</span><span class="pagina-flor" aria-hidden="true">✦</span></div>
+                            <h3 class="pagina-seccion-titulo">Más para descubrir</h3>
+                            @if (resultado.Definiciones.Count > 1)
+                            {
+                                <ol class="pagina-lista-definiciones">
+                                    @foreach (var definicion in resultado.Definiciones.Skip(1))
+                                    {
+                                        <li>@definicion</li>
+                                    }
+                                </ol>
+                            }
+                            else
+                            {
+                                <p class="pagina-texto-intro">Esta entrada reúne su sentido principal. Al leerla en distintas frases, pueden aparecer nuevos matices y asociaciones.</p>
+                            }
+                            <div class="pagina-nota"><span>✧</span><p>Probá buscar sinónimos o una palabra relacionada para ampliar tu lectura.</p></div>
+                        }
+                        else
+                        {
+                            <div class="pagina-encabezado"><span>ÍNDICE LITERARIO</span><span class="pagina-flor" aria-hidden="true">✦</span></div>
+                            <h3 class="pagina-seccion-titulo">Términos para explorar</h3>
+                            <p class="pagina-texto-secundario">Elegí una entrada para abrirla directamente en el diccionario.</p>
+                            <nav class="indice-literario" aria-label="Índice de términos literarios">
+                                @foreach (var termino in Model.TerminosLiterarios)
+                                {
+                                    <a asp-controller="Diccionario" asp-action="Index" asp-route-busqueda="@termino"><span>✧</span>@termino</a>
+                                }
+                            </nav>
+                        }
+                        <span class="numero-pagina">03</span>
+                    </article>
 
-    else if (!string.IsNullOrWhiteSpace(Model.Mensaje))
-    {
-        <section class="diccionario-mensaje" role="status">
-            <span class="mensaje-icono" aria-hidden="true">✧</span>
-            <h2>No encontramos esa palabra</h2>
-            <p>@Model.Mensaje</p>
-        </section>
-    }
+                    <article class="diccionario-pagina diccionario-pagina-derecha">
+                        @if (resultado != null)
+                        {
+                            @if (resultado.Ejemplos.Any())
+                            {
+                                <div class="pagina-encabezado"><span>EN CONTEXTO</span><span class="pagina-flor" aria-hidden="true">❧</span></div>
+                                <h3 class="pagina-seccion-titulo">Ejemplos de uso</h3>
+                                @foreach (var ejemplo in resultado.Ejemplos)
+                                {
+                                    <blockquote class="pagina-ejemplo">“@ejemplo”</blockquote>
+                                }
+                            }
+                            else
+                            {
+                                <div class="pagina-encabezado"><span>PARA SEGUIR LEYENDO</span><span class="pagina-flor" aria-hidden="true">❧</span></div>
+                                <h3 class="pagina-seccion-titulo">Una palabra en contexto</h3>
+                                <p class="pagina-texto-intro">El sentido de una palabra también se descubre en la frase, la historia y la intención de quien la utiliza.</p>
+                            }
+                            @if (!string.IsNullOrWhiteSpace(resultado.Contenido))
+                            {
+                                <details class="pagina-detalles">
+                                    <summary>Leer contexto ampliado</summary>
+                                    <p>@resultado.Contenido</p>
+                                </details>
+                            }
+                            <div class="pagina-fuente">
+                                <span>FUENTE DE CONSULTA</span>
+                                <p>@resultado.Origen</p>
+                                @if (!string.IsNullOrWhiteSpace(resultado.UrlFuente))
+                                {
+                                    <a href="@resultado.UrlFuente" target="_blank" rel="noopener noreferrer">Consultar la entrada original ↗</a>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="pagina-encabezado"><span>PALABRAS PARA EMPEZAR</span><span class="pagina-flor" aria-hidden="true">❧</span></div>
+                            <h3 class="pagina-seccion-titulo">Tres pequeñas puertas</h3>
+                            <div class="palabras-destacadas">
+                                <a asp-controller="Diccionario" asp-action="Index" asp-route-busqueda="serendipia"><strong>Serendipia</strong><span>Un hallazgo afortunado e inesperado.</span></a>
+                                <a asp-controller="Diccionario" asp-action="Index" asp-route-busqueda="nostalgia"><strong>Nostalgia</strong><span>La emoción de volver al pasado con la memoria.</span></a>
+                                <a asp-controller="Diccionario" asp-action="Index" asp-route-busqueda="efímero"><strong>Efímero</strong><span>Aquello que dura poco tiempo.</span></a>
+                            </div>
+                            <p class="pagina-texto-secundario">Las palabras guardan historias, ideas y matices. Cada búsqueda abre una nueva página para descubrirlos.</p>
+                        }
+                        <span class="numero-pagina">04</span>
+                    </article>
+                </div>
+            </div>
+        </div>
+
+        <div class="diccionario-controles-libro">
+            <button type="button" id="paginaAnterior" class="control-pagina" disabled>← Página anterior</button>
+            <span id="estadoPaginas" aria-live="polite">Páginas 1–2 de 4</span>
+            <button type="button" id="paginaSiguiente" class="control-pagina">Pasar página →</button>
+        </div>
+        <p class="ayuda-pasar-pagina">También podés usar las flechas del teclado para pasar las páginas.</p>
+    </section>
 
     <section class="favoritos-banner">
         <div>
             <span class="diccionario-eyebrow">TU COLECCIÓN PERSONAL</span>
             <h2>Guardá las palabras que te inspiran</h2>
-            <p>
-                Creá tu propia colección de palabras para volver a ellas
-                cuando quieras.
-            </p>
+            <p>Creá tu propia colección de palabras para volver a ellas cuando quieras.</p>
         </div>
-        <a asp-controller="Diccionario"
-           asp-action="Favoritos"
-           class="btn-favoritos">
-            Mis favoritos
-        </a>
+        @if (User.Identity?.IsAuthenticated == true)
+        {
+            <a asp-controller="Diccionario" asp-action="Favoritos" class="btn-favoritos">Mis favoritos</a>
+        }
+        else
+        {
+            <a asp-controller="Cuenta" asp-action="Login" class="btn-favoritos">Iniciar sesión</a>
+        }
     </section>
 </main>
+
+@section Scripts {
+    <script src="~/js/diccionario.js" asp-append-version="true"></script>
+}

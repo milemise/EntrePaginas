@@ -132,8 +132,15 @@
             </section>
         </div>
         <section class="reviews-section">
-            <div class="reviews-heading"><h2>Opiniones de lectores</h2><span>@Model.TotalResenas reseñas</span></div>
-            @if (Model.PuedeResenar && Model.MiResenaId is null)
+            <div class="reviews-heading"><div><h2>Opiniones de lectores</h2><span>@Model.TotalResenas reseñas · promedio @Model.PromedioResenas.ToString("0.0") / 5</span></div></div>
+            <form method="get" asp-controller="Libros" asp-action="Detalle" class="admin-search-form review-search-form">
+                <input type="hidden" name="id" value="@libro.Id" />
+                <label class="visually-hidden" for="buscarResena">Buscar reseñas de este libro</label>
+                <input class="form-control" type="search" id="buscarResena" name="buscarResena" value="@Model.BuscarResena" maxlength="150" placeholder="Buscar en las reseñas o por nombre de lector..." />
+                <button type="submit" class="detail-secondary-button">Buscar</button>
+                @if (!string.IsNullOrWhiteSpace(Model.BuscarResena)) { <a class="detail-secondary-button" asp-action="Detalle" asp-route-id="@libro.Id">Limpiar</a> }
+            </form>
+            @if (Model.PuedeResenar && !Model.ContenidoBloqueado && Model.MiResenaId is null)
             {
                 <form asp-controller="Resenas" asp-action="Crear" method="post" class="review-form">
                     <input type="hidden" name="IdLibro" value="@libro.Id" />
@@ -185,7 +192,7 @@
             }
             @if (libro.Resenas.Count == 0)
             {
-                <p class="muted-note">Todavía no hay opiniones. Cuando los lectores compartan su experiencia, aparecerá acá.</p>
+                <p class="muted-note">@(string.IsNullOrWhiteSpace(Model.BuscarResena) ? "Todavía no hay opiniones. Cuando los lectores compartan su experiencia, aparecerá acá." : "No encontramos reseñas con esa búsqueda. Probá con otra palabra o limpiá el filtro.")</p>
             }
             else
             {
@@ -205,7 +212,7 @@
                 @if (Model.TotalPaginasResenas > 1)
                 {
                     <nav class="library-pagination" aria-label="Paginación de reseñas">
-                        @for (var p = 1; p <= Model.TotalPaginasResenas; p++) { <a asp-action="Detalle" asp-route-id="@libro.Id" asp-route-paginaResenas="@p" class="@(p == Model.PaginaResenas ? "active" : "")">@p</a> }
+                        @for (var p = 1; p <= Model.TotalPaginasResenas; p++) { <a asp-action="Detalle" asp-route-id="@libro.Id" asp-route-buscarResena="@Model.BuscarResena" asp-route-paginaResenas="@p" class="@(p == Model.PaginaResenas ? "active" : "")">@p</a> }
                     </nav>
                 }
             }

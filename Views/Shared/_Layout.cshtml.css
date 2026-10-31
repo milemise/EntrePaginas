@@ -46,3 +46,6 @@ button.accept-policy {
   white-space: nowrap;
   line-height: 60px;
 }
+
+.nav-notifications-link { display: inline-flex; align-items: center; gap: 7px; }
+.nav-notifications-count { display: inline-flex; min-width: 20px; height: 20px; align-items: center; justify-content: center; padding: 0 5px; border-radius: 999px; background: #8d463d; color: #fffaf0; font-size: .72rem; font-weight: 700; line-height: 1; }

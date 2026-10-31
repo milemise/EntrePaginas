@@ -148,5 +148,26 @@ public class EntrePaginasContext : DbContext
                 .HasDatabaseName("uq_favorito_usuario_palabra");
         });
 
+        modelBuilder.Entity<Notificacion>(entity =>
+        {
+            entity.ToTable("notificaciones");
+            entity.HasKey(x => x.Id);
+            entity.Property(x => x.Id).HasColumnName("id");
+            entity.Property(x => x.IdUsuario).HasColumnName("id_usuario").IsRequired();
+            entity.Property(x => x.Tipo).HasColumnName("tipo").HasMaxLength(50).IsRequired();
+            entity.Property(x => x.Titulo).HasColumnName("titulo").HasMaxLength(150).IsRequired();
+            entity.Property(x => x.Mensaje).HasColumnName("mensaje").HasColumnType("text").IsRequired();
+            entity.Property(x => x.Leida).HasColumnName("leida").HasDefaultValue(false);
+            entity.Property(x => x.Favorita).HasColumnName("favorita").HasDefaultValue(false);
+            entity.Property(x => x.FechaCreacion).HasColumnName("fecha_creacion").HasColumnType("datetime").HasDefaultValueSql("CURRENT_TIMESTAMP");
+            entity.Property(x => x.EntidadTipo).HasColumnName("entidad_tipo").HasMaxLength(50);
+            entity.Property(x => x.EntidadId).HasColumnName("entidad_id");
+            entity.Property(x => x.UrlDestino).HasColumnName("url_destino").HasMaxLength(500);
+            entity.HasOne<Usuario>().WithMany().HasForeignKey(x => x.IdUsuario).OnDelete(DeleteBehavior.Cascade);
+            entity.HasIndex(x => new { x.IdUsuario, x.FechaCreacion }).HasDatabaseName("idx_notificaciones_usuario_fecha");
+            entity.HasIndex(x => new { x.IdUsuario, x.Leida }).HasDatabaseName("idx_notificaciones_usuario_leida");
+            entity.HasIndex(x => new { x.IdUsuario, x.Favorita }).HasDatabaseName("idx_notificaciones_usuario_favorita");
+        });
+
     }
 }

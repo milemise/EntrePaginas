@@ -12,6 +12,7 @@ public static class DatabaseInitializer
         try
         {
             await context.Database.EnsureCreatedAsync();
+            await AsegurarTablasAuxiliaresAsync(context);
             await ActualizarColumnasDeMetadatosAsync(context);
             if (!await context.Usuarios.AnyAsync(x => x.NombreUsuario == "admin"))
             {
@@ -120,6 +121,44 @@ public static class DatabaseInitializer
             throw;
         }
     }
+    private static async Task AsegurarTablasAuxiliaresAsync(EntrePaginasContext context)
+    {
+        // Las tablas se crean si la base ya existía antes de incorporar el diccionario y las notificaciones.
+        // El SQL estático evita interpolar entradas externas y mantiene la compatibilidad con MariaDB/XAMPP.
+        await context.Database.ExecuteSqlRawAsync("""
+            CREATE TABLE IF NOT EXISTS `palabras_favoritas` (
+                `id` INT NOT NULL AUTO_INCREMENT,
+                `id_usuario` INT NOT NULL,
+                `palabra` VARCHAR(150) NOT NULL,
+                `fecha_agregado` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                PRIMARY KEY (`id`),
+                UNIQUE KEY `uq_favorito_usuario_palabra` (`id_usuario`, `palabra`),
+                CONSTRAINT `fk_favoritos_usuario` FOREIGN KEY (`id_usuario`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+            """);
+
+        await context.Database.ExecuteSqlRawAsync("""
+            CREATE TABLE IF NOT EXISTS `notificaciones` (
+                `id` INT NOT NULL AUTO_INCREMENT,
+                `id_usuario` INT NOT NULL,
+                `tipo` VARCHAR(50) NOT NULL,
+                `titulo` VARCHAR(150) NOT NULL,
+                `mensaje` TEXT NOT NULL,
+                `leida` TINYINT(1) NOT NULL DEFAULT 0,
+                `favorita` TINYINT(1) NOT NULL DEFAULT 0,
+                `fecha_creacion` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                `entidad_tipo` VARCHAR(50) NULL,
+                `entidad_id` INT NULL,
+                `url_destino` VARCHAR(500) NULL,
+                PRIMARY KEY (`id`),
+                KEY `idx_notificaciones_usuario_fecha` (`id_usuario`, `fecha_creacion`),
+                KEY `idx_notificaciones_usuario_leida` (`id_usuario`, `leida`),
+                KEY `idx_notificaciones_usuario_favorita` (`id_usuario`, `favorita`),
+                CONSTRAINT `fk_notificaciones_usuario` FOREIGN KEY (`id_usuario`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+            """);
+    }
+
     private static async Task ActualizarColumnasDeMetadatosAsync(EntrePaginasContext context)
     {
         var conexion = context.Database.GetDbConnection();
@@ -127,19 +166,19 @@ public static class DatabaseInitializer
         if (debeCerrar) await conexion.OpenAsync();
         try
         {
-            foreach (var columna in new[] { (Nombre: "autor", Definicion: "VARCHAR(200) NULL"), (Nombre: "open_library_key", Definicion: "VARCHAR(100) NULL") })
+            foreach (var columna in new[] { "autor", "open_library_key" })
             {
                 await using var comando = conexion.CreateCommand();
                 comando.CommandText = "SELECT COUNT(*) FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'libros' AND COLUMN_NAME = @columna";
                 var parametro = comando.CreateParameter();
                 parametro.ParameterName = "@columna";
-                parametro.Value = columna.Nombre;
+                parametro.Value = columna;
                 comando.Parameters.Add(parametro);
                 var existe = Convert.ToInt32(await comando.ExecuteScalarAsync()) > 0;
-                if (!existe)
-                {
-                    await context.Database.ExecuteSqlRawAsync($"ALTER TABLE libros ADD COLUMN {columna.Nombre} {columna.Definicion}");
-                }
+                if (!existe && columna == "autor")
+                    await context.Database.ExecuteSqlRawAsync("ALTER TABLE `libros` ADD COLUMN `autor` VARCHAR(200) NULL");
+                else if (!existe && columna == "open_library_key")
+                    await context.Database.ExecuteSqlRawAsync("ALTER TABLE `libros` ADD COLUMN `open_library_key` VARCHAR(100) NULL");
             }
         }
         finally

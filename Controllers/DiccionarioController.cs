@@ -53,30 +53,36 @@ public class DiccionarioController : Controller
             try
             {
                 modelo.Resultado =
-                    await _diccionario.BuscarAsync(modelo.Busqueda);
+                    await _diccionario.BuscarAsync(modelo.Busqueda, HttpContext.RequestAborted);
 
                 if (modelo.Resultado == null)
                 {
                     modelo.Mensaje =
-                        "No encontramos una entrada para esa palabra. "
-                        + "Probá con otra búsqueda.";
+                        "No encontramos una definición para esa palabra. "
+                        + "Revisá la escritura o probá con un término relacionado.";
                 }
+            }
+            catch (DiccionarioTemporalmenteNoDisponibleException)
+            {
+                modelo.Mensaje =
+                    "No pudimos mostrar esta definición ahora. "
+                    + "Probá nuevamente o elegí una palabra del índice.";
             }
             catch (HttpRequestException)
             {
                 modelo.Mensaje =
-                    "No pudimos conectar con el diccionario. "
-                    + "Intentá nuevamente en unos minutos.";
+                    "No pudimos mostrar esta definición ahora. "
+                    + "Probá nuevamente o elegí una palabra del índice.";
             }
-            catch (TaskCanceledException)
+            catch (TaskCanceledException) when (!HttpContext.RequestAborted.IsCancellationRequested)
             {
                 modelo.Mensaje =
-                    "La consulta tardó demasiado. Intentá nuevamente.";
+                    "La búsqueda está tardando más de lo esperado. Probá nuevamente.";
             }
             catch (System.Text.Json.JsonException)
             {
                 modelo.Mensaje =
-                    "La respuesta del diccionario no se pudo interpretar.";
+                    "No pudimos mostrar esta definición ahora. Probá con otra palabra.";
             }
         }
 
@@ -130,19 +136,31 @@ public class DiccionarioController : Controller
 
     [Authorize]
     [HttpGet]
-    public async Task<IActionResult> Favoritos()
+    public async Task<IActionResult> Favoritos(string? buscar, int pagina = 1, CancellationToken cancellationToken = default)
     {
         var idUsuario = ObtenerIdUsuario();
+        if (idUsuario == null) return Forbid();
 
-        if (idUsuario == null)
-            return Forbid();
+        const int tamanoPagina = 15;
+        var consulta = _context.PalabrasFavoritas.AsNoTracking()
+            .Where(x => x.IdUsuario == idUsuario.Value);
+        if (!string.IsNullOrWhiteSpace(buscar))
+        {
+            buscar = buscar.Trim();
+            consulta = consulta.Where(x => x.Palabra.Contains(buscar));
+        }
 
-        var favoritos = await _context.PalabrasFavoritas
-            .AsNoTracking()
-            .Where(x => x.IdUsuario == idUsuario.Value)
-            .OrderBy(x => x.Palabra)
-            .ToListAsync();
-
+        var total = await consulta.CountAsync(cancellationToken);
+        var totalPaginas = Math.Max(1, (int)Math.Ceiling(total / (double)tamanoPagina));
+        pagina = Math.Clamp(pagina, 1, totalPaginas);
+        ViewBag.Buscar = buscar;
+        ViewBag.Pagina = pagina;
+        ViewBag.TotalPaginas = totalPaginas;
+        ViewBag.TotalRegistros = total;
+        var favoritos = await consulta.OrderBy(x => x.Palabra)
+            .Skip((pagina - 1) * tamanoPagina)
+            .Take(tamanoPagina)
+            .ToListAsync(cancellationToken);
         return View(favoritos);
     }
 

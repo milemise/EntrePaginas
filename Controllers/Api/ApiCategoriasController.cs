@@ -24,8 +24,9 @@ public class ApiCategoriasController : ControllerBase
 
     [HttpPost]
     [Authorize(Roles = RolesAplicacion.Administrador)]
-    public async Task<IActionResult> Crear([FromBody] CategoriaRequest request, CancellationToken cancellationToken)
+    public async Task<IActionResult> Crear([FromBody] CategoriaRequest? request, CancellationToken cancellationToken)
     {
+        if (request is null) return BadRequest(new { mensaje = "Ingresá un nombre de categoría." });
         var nombre = request.Nombre?.Trim();
         if (string.IsNullOrWhiteSpace(nombre) || nombre.Length > 100) return BadRequest(new { mensaje = "Nombre obligatorio (hasta 100 caracteres)." });
         if (await _context.Categorias.AnyAsync(x => x.Nombre.ToLower() == nombre.ToLower(), cancellationToken)) return Conflict(new { mensaje = "La categoría ya existe." });

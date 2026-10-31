@@ -7,7 +7,7 @@
     <header class="management-header">
         <span class="library-small-title">ADMINISTRACIÓN</span>
         <h1>Usuarios y roles</h1>
-        <p>@Model.TotalRegistros cuentas registradas. Los cambios de rol se aplican al próximo acceso del usuario.</p>
+        <p>@Model.TotalRegistros cuentas encontradas. Para que un cambio de rol se refleje, el usuario debe iniciar sesión nuevamente.</p>
     </header>
     <form method="get"
         asp-action="Usuarios"
@@ -15,7 +15,7 @@
         <input class="form-control"
             name="buscar"
             value="@Model.Buscar"
-            placeholder="Buscar por nombre, usuario o correo..." />
+            type="search" maxlength="150" aria-label="Buscar usuarios" placeholder="Buscar por nombre, usuario, correo o DNI..." />
 
         <button class="detail-secondary-button" type="submit">
             Buscar
@@ -42,6 +42,13 @@
                     </tr>
                 </thead>
             <tbody>
+    @if (Model.Usuarios.Count == 0)
+    {
+        <tr><td colspan="5" class="text-center py-4">
+            <strong>@(string.IsNullOrWhiteSpace(Model.Buscar) ? "Todavía no hay usuarios registrados." : "No encontramos usuarios con esa búsqueda.")</strong>
+            @if (!string.IsNullOrWhiteSpace(Model.Buscar)) { <p class="mb-0 mt-2"><a asp-action="Usuarios">Limpiar búsqueda</a></p> }
+        </td></tr>
+    }
     @foreach (var usuario in Model.Usuarios)
     {
         <tr>

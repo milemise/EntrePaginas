@@ -7,7 +7,13 @@
     var notificaciones = Model?.ToList()
         ?? new List<EntrePaginas.Models.Notificacion>();
 
-    var cantidadNoLeidas = notificaciones.Count(n => !n.Leida);
+    var cantidadNoLeidas = (int)(ViewBag.CantidadNoLeidas ?? 0);
+    var totalNotificacionesUsuario = (int)(ViewBag.TotalNotificacionesUsuario ?? notificaciones.Count);
+    var totalFiltrado = (int)(ViewBag.TotalFiltrado ?? notificaciones.Count);
+    var paginaActual = (int)(ViewBag.Pagina ?? 1);
+    var totalPaginas = (int)(ViewBag.TotalPaginas ?? 1);
+    var busquedaActual = ViewBag.Buscar as string ?? string.Empty;
+    var filtroActual = ViewBag.Filtro as string ?? "todas";
 }
 
 <link rel="stylesheet"
@@ -29,17 +35,17 @@
 
         <div class="notificaciones-resumen">
             <span>
-                <strong>@notificaciones.Count</strong>
-                @(notificaciones.Count == 1
-                    ? "notificación"
-                    : "notificaciones")
+                <strong>@totalFiltrado</strong>
+                @(totalFiltrado == 1
+                    ? "resultado"
+                    : "resultados")
             </span>
 
             <span class="resumen-separador">·</span>
 
             <span>
                 <strong>@cantidadNoLeidas</strong>
-                sin leer
+                sin leer · @totalNotificacionesUsuario en total
             </span>
         </div>
     </section>
@@ -75,14 +81,35 @@
             }
         </div>
 
+        <form method="get" asp-controller="Notificaciones" asp-action="Index" class="notificaciones-buscador">
+            <label class="visually-hidden" for="buscarNotificaciones">Buscar notificaciones</label>
+            <input id="buscarNotificaciones" type="search" name="buscar" value="@busquedaActual" maxlength="150" placeholder="Buscar por título, mensaje o tipo..." />
+            <select name="filtro" aria-label="Filtrar notificaciones">
+                <option value="todas" selected="@(filtroActual == "todas")">Todas</option>
+                <option value="no-leidas" selected="@(filtroActual == "no-leidas")">Sin leer</option>
+                <option value="favoritas" selected="@(filtroActual == "favoritas")">Favoritas</option>
+            </select>
+            <button type="submit" class="btn-notificacion-secundario">Buscar</button>
+            @if (!string.IsNullOrWhiteSpace(busquedaActual) || filtroActual != "todas")
+            {
+                <a asp-controller="Notificaciones" asp-action="Index" class="btn-notificacion-secundario">Limpiar</a>
+            }
+        </form>
+
         @if (!notificaciones.Any())
         {
             <div class="notificaciones-vacias">
                 <span class="notificaciones-vacias-icono">✉</span>
-                <h3>Tu bandeja está tranquila</h3>
+                <h3>@(totalFiltrado == 0 && ( !string.IsNullOrWhiteSpace(busquedaActual) || filtroActual != "todas") ? "No encontramos notificaciones" : "Tu bandeja está tranquila")</h3>
                 <p>
-                    Por ahora no tenés notificaciones.
-                    Cuando haya novedades, las encontrarás acá.
+                    @if (!string.IsNullOrWhiteSpace(busquedaActual) || filtroActual != "todas")
+                    {
+                        <text>Probá con otra palabra o cambiá el filtro para ver otros mensajes.</text>
+                    }
+                    else
+                    {
+                        <text>Por ahora no tenés notificaciones. Cuando haya novedades, las encontrarás acá.</text>
+                    }
                 </p>
 
                 <a asp-controller="Home"
@@ -97,34 +124,20 @@
             <div class="notificaciones-lista">
                 @foreach (var notificacion in notificaciones)
                 {
-                    var esDonacion =
-                        string.Equals(
-                            notificacion.Tipo,
-                            "Donacion",
-                            StringComparison.OrdinalIgnoreCase);
+                    var iconoTipo = notificacion.Tipo switch
+                    {
+                        "Compra" => "✓",
+                        "Alquiler" => "◷",
+                        "Venta" => "↗",
+                        "Resena" => "✎",
+                        "Reporte" => "⚑",
+                        "Moderacion" => "⚖",
+                        _ => "✉"
+                    };
 
-                    <article class="notificacion-card
-                                    @(notificacion.Leida ? "leida" : "no-leida")
-                                    @(notificacion.Favorita ? "es-favorita" : "")
-                                    @(esDonacion ? "notificacion-donacion" : "")">
-
+                    <article class="notificacion-card @(notificacion.Leida ? "leida" : "no-leida") @(notificacion.Favorita ? "es-favorita" : "")">
                         <div class="notificacion-icono">
-                            @if (esDonacion)
-                            {
-                                <span aria-hidden="true">✧</span>
-                            }
-                            else if (notificacion.Tipo == "Reporte")
-                            {
-                                <span aria-hidden="true">⚑</span>
-                            }
-                            else if (notificacion.Tipo == "Comentario")
-                            {
-                                <span aria-hidden="true">✎</span>
-                            }
-                            else
-                            {
-                                <span aria-hidden="true">✉</span>
-                            }
+                            <span aria-hidden="true">@iconoTipo</span>
                         </div>
 
                         <div class="notificacion-cuerpo">
@@ -169,9 +182,7 @@
 
                                         <button type="submit"
                                                 class="btn-notificacion-abrir">
-                                            @(esDonacion
-                                                ? "✧ Abrir para ver"
-                                                : "Ver notificación →")
+                                            Ver notificación →
                                         </button>
                                     </form>
                                 }
@@ -252,6 +263,20 @@
                     </article>
                 }
             </div>
+            @if (totalPaginas > 1)
+            {
+                <nav class="library-pagination" aria-label="Paginación de notificaciones">
+                    @if (paginaActual > 1)
+                    {
+                        <a asp-route-buscar="@busquedaActual" asp-route-filtro="@filtroActual" asp-route-pagina="@(paginaActual - 1)">← Anterior</a>
+                    }
+                    <span>Página @paginaActual de @totalPaginas</span>
+                    @if (paginaActual < totalPaginas)
+                    {
+                        <a asp-route-buscar="@busquedaActual" asp-route-filtro="@filtroActual" asp-route-pagina="@(paginaActual + 1)">Siguiente →</a>
+                    }
+                </nav>
+            }
         }
     </section>
 

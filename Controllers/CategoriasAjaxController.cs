@@ -25,8 +25,9 @@ public class CategoriasAjaxController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Crear([FromBody] CategoriaEntrada entrada, CancellationToken cancellationToken)
+    public async Task<IActionResult> Crear([FromBody] CategoriaEntrada? entrada, CancellationToken cancellationToken)
     {
+        if (entrada is null) return BadRequest(new { mensaje = "Ingresá un nombre de categoría." });
         var nombre = entrada.Nombre?.Trim();
         if (string.IsNullOrWhiteSpace(nombre) || nombre.Length > 100)
             return BadRequest(new { mensaje = "El nombre es obligatorio y debe tener hasta 100 caracteres." });
@@ -39,10 +40,11 @@ public class CategoriasAjaxController : ControllerBase
     }
 
     [HttpPut("{id:int}")]
-    public async Task<IActionResult> Editar(int id, [FromBody] CategoriaEntrada entrada, CancellationToken cancellationToken)
+    public async Task<IActionResult> Editar(int id, [FromBody] CategoriaEntrada? entrada, CancellationToken cancellationToken)
     {
         var categoria = await _context.Categorias.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
         if (categoria is null) return NotFound(new { mensaje = "La categoría no existe." });
+        if (entrada is null) return BadRequest(new { mensaje = "Ingresá un nombre de categoría." });
         var nombre = entrada.Nombre?.Trim();
         if (string.IsNullOrWhiteSpace(nombre) || nombre.Length > 100)
             return BadRequest(new { mensaje = "El nombre es obligatorio y debe tener hasta 100 caracteres." });

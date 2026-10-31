@@ -25,7 +25,10 @@ public class ApiLibrosController : ControllerBase
         if (!string.IsNullOrWhiteSpace(buscar))
         {
             var termino = buscar.Trim();
-            consulta = consulta.Where(x => x.Titulo.Contains(termino) || (x.Autor != null && x.Autor.Contains(termino)) || (x.Descripcion != null && x.Descripcion.Contains(termino)));
+            consulta = consulta.Where(x => x.Titulo.Contains(termino)
+                || (x.Autor != null && x.Autor.Contains(termino))
+                || (x.Descripcion != null && x.Descripcion.Contains(termino))
+                || x.Categoria.Nombre.Contains(termino));
         }
         if (categoriaId.HasValue) consulta = consulta.Where(x => x.IdCategoria == categoriaId.Value);
         consulta = consulta.OrderBy(x => x.Titulo);

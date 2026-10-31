@@ -23,6 +23,17 @@ public class DiccionarioViewModel
         "Narrador omnisciente",
         "Personificación",
         "Símil",
-        "Clímax"
+        "Clímax",
+        "Antagonista",
+        "Prólogo",
+        "Epílogo",
+        "Ironía",
+        "Alegoría",
+        "Fábula",
+        "Desenlace",
+        "Narrativa",
+        "Serendipia",
+        "Nostalgia",
+        "Efímero"
     };
 }

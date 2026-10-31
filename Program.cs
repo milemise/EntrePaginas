@@ -1,5 +1,6 @@
 using System.Text;
 using EntrePaginas.Data;
+using EntrePaginas.Controllers;
 using EntrePaginas.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -8,7 +9,9 @@ using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllersWithViews();
+// Se registra explícitamente el ensamblado que contiene los controladores MVC.
+builder.Services.AddControllersWithViews()
+    .AddApplicationPart(typeof(HomeController).Assembly);
 builder.Services.AddAntiforgery(options =>
 {
     options.HeaderName = "RequestVerificationToken";
@@ -27,6 +30,7 @@ builder.Services.AddDbContext<EntrePaginasContext>(options =>
     options.UseMySql(connectionString, versionServidor));
 
 builder.Services.AddScoped<UploadStorageService>();
+builder.Services.AddScoped<NotificacionService>();
 builder.Services.AddMemoryCache();
 builder.Services.AddHttpClient<DiccionarioApiService>();
 builder.Services.AddHttpClient<OpenLibraryService>(client =>
@@ -83,17 +87,20 @@ if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
+    app.UseHttpsRedirection();
 }
-
-app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
+// Endpoints con atributos (API REST y rutas explícitas de inicio).
 app.MapControllers();
+
+// Rutas MVC convencionales para los módulos que no utilizan rutas por atributo.
+// La página de inicio tiene rutas explícitas en HomeController: / y /Home/Index.
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller}/{action}/{id?}");
 
 app.Run();

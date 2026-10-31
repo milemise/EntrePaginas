@@ -1,0 +1,11 @@
+ENTRE PÁGINAS - PROYECTO CONSOLIDADO
+
+1. Extraé todo este ZIP en una carpeta nueva, por ejemplo D:\EntrePaginas-Completo. No mezcles estos archivos con carpetas de parches anteriores.
+2. Abrí appsettings.json y verificá ConnectionStrings:DefaultConnection para tu instalación de XAMPP/MariaDB.
+3. Iniciá MySQL/MariaDB en XAMPP y comprobá que exista la base entre_paginas.
+4. Desde esta carpeta ejecutá: dotnet restore, dotnet build y dotnet run.
+5. En desarrollo, abrí la URL HTTP que muestra la consola. La página de inicio también está mapeada explícitamente en / y /Home/Index.
+
+El archivo SQL está en database/entre_paginas.sql. Si ya tenés información que querés conservar, hacé una copia de seguridad antes de importar o modificar la base.
+
+La compilación final debe verificarse con el SDK de .NET 10 instalado en la computadora de destino.

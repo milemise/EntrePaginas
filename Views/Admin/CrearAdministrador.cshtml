@@ -80,8 +80,7 @@
                         <label asp-for="Telefono">Teléfono</label>
                         <input asp-for="Telefono"
                                class="form-control"
-                               placeholder="Número de teléfono"
-                               required />
+                               placeholder="Número de teléfono (opcional)" />
                         <span asp-validation-for="Telefono"
                               class="text-danger"></span>
                     </div>
@@ -124,6 +123,18 @@
                                autocomplete="new-password"
                                required />
                         <span asp-validation-for="Password"
+                              class="text-danger"></span>
+                    </div>
+
+                    <div class="admin-form-field admin-form-full">
+                        <label asp-for="ConfirmarPassword">Confirmar contraseña</label>
+                        <input asp-for="ConfirmarPassword"
+                               type="password"
+                               class="form-control"
+                               placeholder="Repetí la contraseña"
+                               autocomplete="new-password"
+                               required />
+                        <span asp-validation-for="ConfirmarPassword"
                               class="text-danger"></span>
                     </div>
 
