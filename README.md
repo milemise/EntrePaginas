@@ -87,7 +87,7 @@ Una obra puede estar relacionada con un libro anterior. La primera entrega puede
 
 ### Notificaciones
 
-Las notificaciones se almacenan en la base de datos y se muestran dentro de la aplicación. Se generan ante eventos relevantes, como una compra, un alquiler, una nueva reseña o el reporte de una reseña. No se utilizan correos electrónicos ni notificaciones push; el módulo está diseñado para ser simple de probar y mantener durante la presentación.
+Las notificaciones se almacenan en la base de datos y se muestran dentro de la aplicación. - Recibir notificaciones internas sobre nuevas compras, alquileres y reseñas relacionadas con sus obras.
 
 ## 4. Catálogo y Open Library
 
@@ -113,7 +113,7 @@ Las búsquedas más recientes se conservan en caché para reducir solicitudes ex
 - AJAX y JSON para operaciones asíncronas.
 - BCrypt para almacenar hashes de contraseñas.
 - JWT para autenticar los endpoints de la API REST.
-- Open Library API y Wikcionario para consultas bibliográficas y léxicas.
+- Open Library API, Wikcionario y un servicio externo de consulta del Diccionario de la lengua española para las búsquedas bibliográficas y léxicas.
 - Postman para probar los endpoints protegidos con JWT.
 
 ## 7. Operaciones asíncronas, búsqueda y paginación
@@ -165,7 +165,6 @@ Cuando se inicializa una base que no contiene esas cuentas, el sistema crea:
 | Escritor | `escritor_demo` | `Escritor123!` |
 | Lector | `lector_demo` | `Lector123!` |
 
-Estas cuentas son exclusivamente para pruebas locales. No se deben utilizar en un entorno público. Antes de un despliegue real, se deben cambiar las credenciales, configurar un secreto JWT propio y establecer una cadena de conexión segura.
 
 ## 10. Archivos y seguridad
 
