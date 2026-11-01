@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 20-10-2026 a las 00:27:44
+-- Tiempo de generación: 01-11-2026 a las 21:01:24
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.0.30
 
@@ -19,7 +19,6 @@ SET time_zone = "+00:00";
 
 --
 -- Base de datos: `entre_paginas`
--- Este archivo contiene solo estructura. Los datos de demostración se crean desde DatabaseInitializer.
 --
 
 -- --------------------------------------------------------
@@ -38,10 +37,6 @@ CREATE TABLE `alquileres` (
   `activo` tinyint(1) NOT NULL DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Volcado de datos para la tabla `alquileres`
---
-
 -- --------------------------------------------------------
 
 --
@@ -56,6 +51,14 @@ CREATE TABLE `categorias` (
 --
 -- Volcado de datos para la tabla `categorias`
 --
+
+INSERT INTO `categorias` (`id`, `nombre`) VALUES
+(5, 'Ciencia ficción'),
+(1, 'Fantasía'),
+(3, 'Historia'),
+(2, 'Literatura infantil'),
+(6, 'Misterio'),
+(4, 'Romance');
 
 -- --------------------------------------------------------
 
@@ -75,6 +78,9 @@ CREATE TABLE `compras` (
 --
 -- Volcado de datos para la tabla `compras`
 --
+
+INSERT INTO `compras` (`id`, `id_libro`, `id_lector`, `fecha_compra`, `importe`, `devuelto`) VALUES
+(1, 4, 5, '2026-11-01 16:42:18', 1999.00, 0);
 
 -- --------------------------------------------------------
 
@@ -102,6 +108,12 @@ CREATE TABLE `libros` (
 -- Volcado de datos para la tabla `libros`
 --
 
+INSERT INTO `libros` (`id`, `titulo`, `autor`, `open_library_key`, `descripcion`, `portada_url`, `archivo_url`, `precio_compra`, `precio_alquiler`, `es_mas_18`, `id_categoria`, `id_escritor`, `id_libro_anterior`) VALUES
+(1, 'Las aventuras de Pinocho', 'Carlo Collodi', NULL, 'Un clásico de la literatura infantil que acompaña el viaje de Pinocho para convertirse en un niño de verdad. Este archivo es una muestra de lectura de prueba del sistema.', 'images/portada1.jpg', 'muestra-pinocho.pdf', 3500.00, 700.00, 0, 2, 2, NULL),
+(2, 'Mamá nos dijo adiós', 'Lucía Paredes (obra de muestra)', NULL, 'Una historia sobre los vínculos familiares, la memoria y los viajes que marcan una vida. El archivo adjunto es una muestra de lectura de prueba.', 'images/portada2.jpg', 'muestra-mama.pdf', 5200.00, 900.00, 0, 3, 2, NULL),
+(3, 'Harry Potter y la piedra filosofal', 'J. K. Rowling', NULL, 'La historia de un joven que descubre un mundo mágico y comienza una aventura inolvidable. El archivo adjunto es una muestra de lectura de prueba.', 'images/portada3.jpg', 'muestra-harry-potter.pdf', 6500.00, 1100.00, 0, 1, 2, NULL),
+(4, 'La última página', 'Maria Lourdes Villegas', NULL, 'Un libro de prueba', 'uploads/portadas/6836b2422cf24c32ba557f282ce64aea.jpg', '6c51540019c64e75a9250f9f46a4334e.pdf', 1999.00, 1666.00, 0, 3, 4, NULL);
+
 -- --------------------------------------------------------
 
 --
@@ -122,6 +134,18 @@ CREATE TABLE `notificaciones` (
   `url_destino` varchar(500) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Volcado de datos para la tabla `notificaciones`
+--
+
+INSERT INTO `notificaciones` (`id`, `id_usuario`, `tipo`, `titulo`, `mensaje`, `leida`, `favorita`, `fecha_creacion`, `entidad_tipo`, `entidad_id`, `url_destino`) VALUES
+(1, 5, 'Compra', 'Compra registrada', 'La compra de «La última página» quedó registrada. Ya podés acceder al libro desde tu biblioteca.', 0, 0, '2026-11-01 16:42:18', 'Libro', 4, '/Biblioteca/Compras'),
+(2, 4, 'Venta', 'Nueva compra de una obra', 'Un lector compró «La última página».', 0, 0, '2026-11-01 16:42:18', 'Libro', 4, '/Escritores/Estadisticas'),
+(3, 4, 'Resena', 'Nueva reseña en tu libro', 'Un lector publicó una reseña en «La última página».', 1, 0, '2026-11-01 16:44:05', 'Libro', 4, '/Libros/Detalle/4'),
+(4, 1, 'Reporte', 'Reseña reportada', 'Se reportó una reseña del libro «La última página».', 0, 0, '2026-11-01 16:49:39', 'Resena', 1, '/Admin/ResenasReportadas'),
+(5, 7, 'Reporte', 'Reseña reportada', 'Se reportó una reseña del libro «La última página».', 1, 0, '2026-11-01 16:49:39', 'Resena', 1, '/Admin/ResenasReportadas'),
+(6, 4, 'Moderacion', 'Reporte revisado', 'La administración revisó el reporte de una reseña de «La última página» y decidió mantenerla publicada.', 0, 0, '2026-11-01 17:00:22', 'Libro', 4, '/Libros/Detalle/4');
+
 -- --------------------------------------------------------
 
 --
@@ -134,10 +158,6 @@ CREATE TABLE `palabras_favoritas` (
   `palabra` varchar(150) NOT NULL,
   `fecha_agregado` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Volcado de datos para la tabla `palabras_favoritas`
---
 
 -- --------------------------------------------------------
 
@@ -159,6 +179,9 @@ CREATE TABLE `resenas` (
 --
 -- Volcado de datos para la tabla `resenas`
 --
+
+INSERT INTO `resenas` (`id`, `id_libro`, `id_lector`, `puntuacion`, `comentario`, `fecha_comentario`, `anonimo`, `reportado`) VALUES
+(1, 4, 5, 5, 'DIVINO', '2026-11-01 16:44:05', 0, 0);
 
 -- --------------------------------------------------------
 
@@ -183,6 +206,14 @@ CREATE TABLE `usuarios` (
 --
 -- Volcado de datos para la tabla `usuarios`
 --
+
+INSERT INTO `usuarios` (`id`, `nombre`, `apellido`, `nombre_usuario`, `email`, `password`, `dni`, `telefono`, `fecha_nacimiento`, `avatar_url`, `rol`) VALUES
+(1, 'Administración', 'Entre Páginas', 'admin', 'admin@entrepaginas.local', '$2a$11$zo9pjBW8iAHhhGndtnkt3e.ifL5YF5/nk6CMIG5gTnoj2K6zwxI8u', '90000001', NULL, '1990-01-01', NULL, 'Administrador'),
+(2, 'Lucía', 'Paredes', 'escritor_demo', 'escritor@entrepaginas.local', '$2a$11$LqybBSCsMTofS83x.HDcQuw3ZHf7aMpqnY1AEcyneyertqMMCTEzO', '90000002', NULL, '1994-04-12', NULL, 'Escritor'),
+(3, 'Mateo', 'Luna', 'lector_demo', 'lector@entrepaginas.local', '$2a$11$mWURr73dlwexSWXWMVP2bOoKrUnT/3.swVK8b4nqcpZqL90.uqvqi', '90000003', NULL, '2000-07-07', NULL, 'Lector'),
+(4, 'Lourdes', 'Villegas', 'lulu', 'lulu@gmail.com', '$2a$11$NXy7aloNiazhuBAM0GKmL.zbHji4by6y8IDXfP1KACrElr7sM8k7i', '46332709', '2665112822', '2005-02-17', 'uploads/avatares/a072cc32f16740da9690a71075410de8.jpg', 'Escritor'),
+(5, 'Mile', 'Miselli', 'milen', 'mile@gmail.com', '$2a$11$6CHNUjJ0D2I4dkoQk2lPV.7ta0ShCtIu5VvuXbHuyweI/y7cD6vUm', '45362615', '3666262662626', '2000-01-01', NULL, 'Lector'),
+(7, 'admin', 'admin', 'administrador', 'admin@gmail.com', '$2a$11$6CHNUjJ0D2I4dkoQk2lPV.7ta0ShCtIu5VvuXbHuyweI/y7cD6vUm', '45445445', '4444444444', '2000-11-01', NULL, 'Administrador');
 
 --
 -- Índices para tablas volcadas
@@ -261,49 +292,49 @@ ALTER TABLE `usuarios`
 -- AUTO_INCREMENT de la tabla `alquileres`
 --
 ALTER TABLE `alquileres`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `categorias`
 --
 ALTER TABLE `categorias`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT de la tabla `compras`
 --
 ALTER TABLE `compras`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT de la tabla `libros`
 --
 ALTER TABLE `libros`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT de la tabla `notificaciones`
 --
 ALTER TABLE `notificaciones`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT de la tabla `palabras_favoritas`
 --
 ALTER TABLE `palabras_favoritas`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `resenas`
 --
 ALTER TABLE `resenas`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT de la tabla `usuarios`
 --
 ALTER TABLE `usuarios`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- Restricciones para tablas volcadas

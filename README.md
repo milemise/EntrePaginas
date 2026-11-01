@@ -4,6 +4,20 @@
 
 El sistema contempla tres roles principales: lectores, escritores y administradores. Cada rol dispone de acciones y permisos propios, que se controlan en el servidor.
 
+## Usuarios para ingresar 
+
+### ROL ESCRITOR
+- Usuario: lulu 
+- Contraseña: 12345678
+
+### ROL LECTOR
+- Usuario: milen
+- Contraseña: 12345678
+
+### ROL ADMINISTRADOR
+- Usuario: administrador
+- Contraseña: 12345678
+
 ## 1. Funcionalidades por rol
 
 ### Lector
